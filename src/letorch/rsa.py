@@ -11,7 +11,7 @@ from typing import Literal
 import torch
 import torch.nn.functional as F
 
-__all__ = ["compute_rdm", "rdm_upper_tri", "rsa"]
+__all__ = ["RSA"]
 
 
 # ---------------------------------------------------------------------------
@@ -72,7 +72,6 @@ def _pearsonr(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     xm = x - x.mean()
     ym = y - y.mean()
     denom = xm.norm() * ym.norm()
-    # Use torch.where to stay on-device without a Python-level branch
     return torch.where(
         denom > 0,
         (xm * ym).sum() / denom,
@@ -89,18 +88,13 @@ def _spearmanr(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 # Public API
 # ---------------------------------------------------------------------------
 
-def compute_rdm(
-    X: torch.Tensor,
-    metric: Literal["correlation", "cosine", "euclidean", "cityblock"] = "correlation",
-) -> torch.Tensor:
-    """Compute the Representational Dissimilarity Matrix (RDM).
+class RSA:
+    """Representational Similarity Analysis in PyTorch.
 
     Parameters
     ----------
-    X : Tensor, shape ``(n_stimuli, n_features)``
-        One row per stimulus.
-    metric : str
-        Pairwise distance metric.
+    rdm_metric : str
+        Pairwise distance metric used when building RDMs.
 
         ``'correlation'`` (default)
             1 − Pearson r between rows.  Invariant to row-wise scaling
@@ -111,107 +105,96 @@ def compute_rdm(
             L2 distance.
         ``'cityblock'``
             L1 / Manhattan distance.
-
-    Returns
-    -------
-    rdm : Tensor, shape ``(n_stimuli, n_stimuli)``
-        Symmetric matrix with zero diagonal.
-
-    Notes
-    -----
-    The tensor is on the same device as *X*.
-    """
-    if metric not in _METRICS:
-        raise ValueError(
-            f"Unknown metric '{metric}'. Choose from {sorted(_METRICS)}."
-        )
-    return _METRICS[metric](X)  # type: ignore[operator]
-
-
-def rdm_upper_tri(rdm: torch.Tensor) -> torch.Tensor:
-    """Extract the strict upper-triangle of an RDM as a flat 1-D vector.
-
-    Parameters
-    ----------
-    rdm : Tensor, shape ``(n, n)``
-
-    Returns
-    -------
-    vec : Tensor, shape ``(n*(n-1)//2,)``
-    """
-    n = rdm.shape[0]
-    rows, cols = torch.triu_indices(n, n, offset=1, device=rdm.device)
-    return rdm[rows, cols]
-
-
-def rsa(
-    X: torch.Tensor,
-    Y: torch.Tensor,
-    rdm_metric: Literal["correlation", "cosine", "euclidean", "cityblock"] = "correlation",
-    compare: Literal["spearman", "pearson"] = "spearman",
-) -> torch.Tensor:
-    """Compute Representational Similarity Analysis (RSA).
-
-    Builds an RDM for each representation matrix, vectorises the upper
-    triangles, and correlates them.
-
-    Parameters
-    ----------
-    X, Y : Tensor, shape ``(n_stimuli, n_features_*)``
-        Row-per-stimulus matrices.  Both must have the same number of rows;
-        feature dimensionalities may differ.
-    rdm_metric : str
-        Distance metric for building RDMs.
-        ``'correlation'`` (default), ``'cosine'``, ``'euclidean'``,
-        ``'cityblock'``.
     compare : str
-        Correlation method for comparing RDM vectors.
+        Correlation method used when comparing RDM vectors.
         ``'spearman'`` (default) or ``'pearson'``.
-
-    Returns
-    -------
-    r : scalar Tensor
-        Correlation coefficient in ``[−1, +1]``.
-        Call ``.item()`` to get a Python float.
-
-    Notes
-    -----
-    **GPU support** — pass GPU tensors and all computation stays on device::
-
-        X_gpu = X.cuda()
-        Y_gpu = Y.cuda()
-        r = rsa(X_gpu, Y_gpu)   # runs entirely on GPU
-
-    P-values are not computed here; use ``scipy.stats.spearmanr`` on the
-    upper-triangle vectors if needed.
 
     Examples
     --------
     >>> import torch
-    >>> from letorch.rsa import rsa
+    >>> from letorch.rsa import RSA
+    >>> rsa = RSA(rdm_metric="correlation", compare="spearman")
     >>> X = torch.randn(50, 128)
     >>> Y = torch.randn(50, 256)
-    >>> rsa(X, X).item()   # identical → 1.0
+    >>> rsa.rsa(X, X).item()   # identical → 1.0
     1.0
-    >>> rsa(X, Y).item()   # independent → ≈ 0.0
+    >>> rsa.rsa(X, Y).item()   # independent → ≈ 0.0
     """
-    if X.shape[0] != Y.shape[0]:
-        raise ValueError(
-            f"X and Y must have the same number of stimuli (rows). "
-            f"Got X: {X.shape[0]}, Y: {Y.shape[0]}."
-        )
 
-    rdm_x = compute_rdm(X, metric=rdm_metric)
-    rdm_y = compute_rdm(Y, metric=rdm_metric)
+    def __init__(
+        self,
+        rdm_metric: Literal["correlation", "cosine", "euclidean", "cityblock"] = "correlation",
+        compare: Literal["spearman", "pearson"] = "spearman",
+    ) -> None:
+        if rdm_metric not in _METRICS:
+            raise ValueError(
+                f"Unknown metric '{rdm_metric}'. Choose from {sorted(_METRICS)}."
+            )
+        if compare not in ("spearman", "pearson"):
+            raise ValueError(
+                f"Unknown compare method '{compare}'. Use 'spearman' or 'pearson'."
+            )
+        self.rdm_metric = rdm_metric
+        self.compare = compare
 
-    vec_x = rdm_upper_tri(rdm_x)
-    vec_y = rdm_upper_tri(rdm_y)
+    def compute_rdm(self, X: torch.Tensor) -> torch.Tensor:
+        """Compute the Representational Dissimilarity Matrix (RDM).
 
-    if compare == "spearman":
-        return _spearmanr(vec_x, vec_y)
-    elif compare == "pearson":
-        return _pearsonr(vec_x, vec_y)
-    else:
-        raise ValueError(
-            f"Unknown compare method '{compare}'. Use 'spearman' or 'pearson'."
-        )
+        Parameters
+        ----------
+        X : Tensor, shape ``(n_stimuli, n_features)``
+            One row per stimulus.
+
+        Returns
+        -------
+        rdm : Tensor, shape ``(n_stimuli, n_stimuli)``
+            Symmetric matrix with zero diagonal.
+        """
+        return _METRICS[self.rdm_metric](X)  # type: ignore[operator]
+
+    def rdm_upper_tri(self, rdm: torch.Tensor) -> torch.Tensor:
+        """Extract the strict upper-triangle of an RDM as a flat 1-D vector.
+
+        Parameters
+        ----------
+        rdm : Tensor, shape ``(n, n)``
+
+        Returns
+        -------
+        vec : Tensor, shape ``(n*(n-1)//2,)``
+        """
+        n = rdm.shape[0]
+        rows, cols = torch.triu_indices(n, n, offset=1, device=rdm.device)
+        return rdm[rows, cols]
+
+    def rsa(self, X: torch.Tensor, Y: torch.Tensor) -> torch.Tensor:
+        """Compute Representational Similarity Analysis (RSA).
+
+        Builds an RDM for each representation matrix, vectorises the upper
+        triangles, and correlates them using the settings from ``__init__``.
+
+        Parameters
+        ----------
+        X, Y : Tensor, shape ``(n_stimuli, n_features_*)``
+            Row-per-stimulus matrices.  Both must have the same number of rows;
+            feature dimensionalities may differ.
+
+        Returns
+        -------
+        r : scalar Tensor
+            Correlation coefficient in ``[−1, +1]``.
+            Call ``.item()`` to get a Python float.
+        """
+        if X.shape[0] != Y.shape[0]:
+            raise ValueError(
+                f"X and Y must have the same number of stimuli (rows). "
+                f"Got X: {X.shape[0]}, Y: {Y.shape[0]}."
+            )
+
+        vec_x = self.rdm_upper_tri(self.compute_rdm(X))
+        vec_y = self.rdm_upper_tri(self.compute_rdm(Y))
+
+        if self.compare == "spearman":
+            return _spearmanr(vec_x, vec_y)
+        else:
+            return _pearsonr(vec_x, vec_y)

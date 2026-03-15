@@ -14,25 +14,36 @@ pip install letorch
 
 ```python
 import torch
-from letorch import rsa, compute_rdm
+from letorch import RSA
 
 # Two representation matrices — rows = stimuli, columns = features
 X = torch.randn(50, 512)   # e.g. embeddings from model A
 Y = torch.randn(50, 768)   # e.g. embeddings from model B (different dim is fine)
 
+rsa = RSA(rdm_metric="correlation", compare="spearman")
+
 # Full RSA pipeline: RDM → upper triangle → Spearman correlation
-r = rsa(X, Y)
+r = rsa.rsa(X, Y)
 print(r.item())   # scalar in [−1, +1]
 
 # GPU — just pass GPU tensors, no other changes needed
-r_gpu = rsa(X.cuda(), Y.cuda())
+r_gpu = rsa.rsa(X.cuda(), Y.cuda())
 ```
 
 ## API
 
-### `compute_rdm(X, metric="correlation") → Tensor`
+### `RSA(rdm_metric="correlation", compare="spearman")`
 
-Compute the Representational Dissimilarity Matrix for a stimulus set.
+Instantiate an RSA object with the desired settings.
+
+| Argument | Options | Default |
+|---|---|---|
+| `rdm_metric` | `"correlation"`, `"cosine"`, `"euclidean"`, `"cityblock"` | `"correlation"` |
+| `compare` | `"spearman"`, `"pearson"` | `"spearman"` |
+
+### `RSA.compute_rdm(X) → Tensor`
+
+Compute the Representational Dissimilarity Matrix for a stimulus set using the instance's `rdm_metric`.
 
 | Metric | Description |
 |---|---|
@@ -43,18 +54,13 @@ Compute the Representational Dissimilarity Matrix for a stimulus set.
 
 Returns a symmetric `(n_stimuli, n_stimuli)` tensor with zero diagonal.
 
-### `rdm_upper_tri(rdm) → Tensor`
+### `RSA.rdm_upper_tri(rdm) → Tensor`
 
 Extract the strict upper triangle of an RDM as a flat 1-D vector of length `n*(n-1)//2`.
 
-### `rsa(X, Y, rdm_metric="correlation", compare="spearman") → Tensor`
+### `RSA.rsa(X, Y) → Tensor`
 
-Full RSA pipeline: build RDMs → vectorise upper triangles → correlate.
-
-| Argument | Options | Default |
-|---|---|---|
-| `rdm_metric` | `"correlation"`, `"cosine"`, `"euclidean"`, `"cityblock"` | `"correlation"` |
-| `compare` | `"spearman"`, `"pearson"` | `"spearman"` |
+Full RSA pipeline: build RDMs → vectorise upper triangles → correlate, using the instance's `rdm_metric` and `compare` settings.
 
 Returns a scalar tensor. Call `.item()` for a Python float.
 
@@ -63,36 +69,3 @@ Returns a scalar tensor. Call `.item()` for a Python float.
 - All operations — RDM construction, ranking, correlation — run on **GPU** when tensors are on GPU
 - No `scipy` dependency at runtime
 - Integrates naturally into PyTorch model evaluation loops and `torch.no_grad()` blocks
-
-## Publishing to TestPyPI / PyPI
-
-```bash
-# Install build tools
-pip install build twine
-
-# Build source + wheel distributions
-python -m build
-
-# Upload to TestPyPI first
-twine upload --repository testpypi dist/*
-
-# Install from TestPyPI to verify
-pip install --index-url https://test.pypi.org/simple/ letorch
-
-# When satisfied, upload to the real PyPI
-twine upload dist/*
-```
-
-## Development
-
-```bash
-# Install in editable mode with dev extras
-pip install -e ".[dev]"
-
-# Run tests
-pytest tests/
-```
-
-## License
-
-MIT

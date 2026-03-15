@@ -6,7 +6,7 @@ Run with:  pytest tests/
 import pytest
 import torch
 
-from letorch.rsa import compute_rdm, rdm_upper_tri, rsa
+from letorch.rsa import RSA
 
 
 # ---------------------------------------------------------------------------
@@ -31,28 +31,28 @@ def _orthogonal_pair(n: int = 50, d_total: int = 256, seed: int = 0):
 class TestComputeRDM:
     def test_output_shape(self):
         X = torch.randn(20, 64)
-        assert compute_rdm(X).shape == (20, 20)
+        assert RSA().compute_rdm(X).shape == (20, 20)
 
     @pytest.mark.parametrize("metric", ["correlation", "cosine", "euclidean", "cityblock"])
     def test_diagonal_zero(self, metric):
         X = torch.randn(20, 64)
-        rdm = compute_rdm(X, metric=metric)
+        rdm = RSA(rdm_metric=metric).compute_rdm(X)
         assert rdm.diagonal().abs().max().item() < 1e-5
 
     @pytest.mark.parametrize("metric", ["correlation", "cosine", "euclidean", "cityblock"])
     def test_symmetry(self, metric):
         X = torch.randn(20, 64)
-        rdm = compute_rdm(X, metric=metric)
+        rdm = RSA(rdm_metric=metric).compute_rdm(X)
         assert (rdm - rdm.T).abs().max().item() < 1e-5
 
     @pytest.mark.parametrize("metric", ["correlation", "cosine", "euclidean", "cityblock"])
     def test_non_negative(self, metric):
         X = torch.randn(20, 64)
-        assert compute_rdm(X, metric=metric).min().item() >= -1e-6
+        assert RSA(rdm_metric=metric).compute_rdm(X).min().item() >= -1e-6
 
     def test_unknown_metric_raises(self):
         with pytest.raises(ValueError, match="Unknown metric"):
-            compute_rdm(torch.randn(10, 32), metric="minkowski")
+            RSA(rdm_metric="minkowski")
 
 
 # ---------------------------------------------------------------------------
@@ -62,7 +62,7 @@ class TestComputeRDM:
 class TestRdmUpperTri:
     def test_length(self):
         n = 20
-        vec = rdm_upper_tri(torch.zeros(n, n))
+        vec = RSA().rdm_upper_tri(torch.zeros(n, n))
         assert vec.shape[0] == n * (n - 1) // 2
 
     def test_values(self):
@@ -71,7 +71,7 @@ class TestRdmUpperTri:
         rdm[0, 2] = 2.0
         rdm[1, 2] = 3.0
         rdm = rdm + rdm.T  # make symmetric
-        vec = rdm_upper_tri(rdm)
+        vec = RSA().rdm_upper_tri(rdm)
         assert torch.allclose(vec, torch.tensor([1.0, 2.0, 3.0]))
 
 
@@ -83,13 +83,13 @@ class TestRSAIdentical:
     @pytest.mark.parametrize("metric", ["correlation", "cosine", "euclidean", "cityblock"])
     def test_identical_spearman(self, metric):
         X = torch.randn(30, 64)
-        r = rsa(X, X, rdm_metric=metric, compare="spearman")
+        r = RSA(rdm_metric=metric, compare="spearman").rsa(X, X)
         assert abs(r.item() - 1.0) < 1e-4, f"metric={metric}: r={r.item()}"
 
     @pytest.mark.parametrize("metric", ["correlation", "cosine", "euclidean", "cityblock"])
     def test_identical_pearson(self, metric):
         X = torch.randn(30, 64)
-        r = rsa(X, X, rdm_metric=metric, compare="pearson")
+        r = RSA(rdm_metric=metric, compare="pearson").rsa(X, X)
         assert abs(r.item() - 1.0) < 1e-4, f"metric={metric}: r={r.item()}"
 
 
@@ -101,16 +101,16 @@ class TestRSAInvariances:
     def test_scaling_invariance(self):
         """correlation-distance RSA is invariant to isotropic row scaling."""
         X = torch.randn(50, 64)
-        assert abs(rsa(X, X * 100).item() - 1.0) < 1e-4
+        assert abs(RSA().rsa(X, X * 100).item() - 1.0) < 1e-4
 
     def test_translation_invariance(self):
         """correlation-distance RSA is invariant to adding the same scalar to all elements."""
         X = torch.randn(50, 64)
-        assert abs(rsa(X, X + 999.0).item() - 1.0) < 1e-4
+        assert abs(RSA().rsa(X, X + 999.0).item() - 1.0) < 1e-4
 
     def test_combined_scaling_and_translation(self):
         X = torch.randn(50, 64)
-        assert abs(rsa(X, X * 7 + 42).item() - 1.0) < 1e-4
+        assert abs(RSA().rsa(X, X * 7 + 42).item() - 1.0) < 1e-4
 
 
 # ---------------------------------------------------------------------------
@@ -123,14 +123,15 @@ class TestRSAOrthogonal:
         torch.manual_seed(99)
         X_a = torch.randn(50, 128)
         Y_a = torch.randn(50, 128)
-        r = rsa(X_a, Y_a)
+        r = RSA().rsa(X_a, Y_a)
         assert abs(r.item()) < 0.15
 
     def test_random_gaussian_mean_near_zero(self):
         """Mean RSA over many independent pairs should be ≈ 0."""
         torch.manual_seed(0)
+        rsa = RSA()
         scores = [
-            rsa(torch.randn(50, 128), torch.randn(50, 128)).item()
+            rsa.rsa(torch.randn(50, 128), torch.randn(50, 128)).item()
             for _ in range(100)
         ]
         assert abs(sum(scores) / len(scores)) < 0.05
@@ -144,12 +145,12 @@ class TestRSAMixedDims:
     def test_different_feature_dims(self):
         X = torch.randn(30, 64)
         Y = torch.randn(30, 256)
-        r = rsa(X, Y)
+        r = RSA().rsa(X, Y)
         assert r.shape == torch.Size([])   # scalar
 
     def test_mismatched_stimuli_raises(self):
         with pytest.raises(ValueError, match="same number of stimuli"):
-            rsa(torch.randn(30, 64), torch.randn(40, 64))
+            RSA().rsa(torch.randn(30, 64), torch.randn(40, 64))
 
 
 # ---------------------------------------------------------------------------
@@ -159,11 +160,11 @@ class TestRSAMixedDims:
 class TestRSAErrors:
     def test_unknown_compare_raises(self):
         with pytest.raises(ValueError, match="compare method"):
-            rsa(torch.randn(10, 32), torch.randn(10, 32), compare="kendall")
+            RSA(compare="kendall")
 
     def test_unknown_rdm_metric_raises(self):
         with pytest.raises(ValueError, match="Unknown metric"):
-            rsa(torch.randn(10, 32), torch.randn(10, 32), rdm_metric="hamming")
+            RSA(rdm_metric="hamming")
 
 
 # ---------------------------------------------------------------------------
@@ -174,14 +175,14 @@ class TestRSAErrors:
 class TestRSAGPU:
     def test_identical_on_gpu(self):
         X = torch.randn(30, 64, device="cuda")
-        r = rsa(X, X)
+        r = RSA().rsa(X, X)
         assert r.device.type == "cuda"
         assert abs(r.item() - 1.0) < 1e-4
 
     def test_random_on_gpu(self):
         X = torch.randn(30, 64, device="cuda")
         Y = torch.randn(30, 64, device="cuda")
-        r = rsa(X, Y)
+        r = RSA().rsa(X, Y)
         assert r.device.type == "cuda"
 
 
@@ -211,27 +212,24 @@ class TestRSAVsScipy:
         return float(r)
 
     def test_identical_matches_scipy(self):
-        import numpy as np
         torch.manual_seed(1)
         X = torch.randn(30, 64)
-        r_ours = rsa(X, X).item()
+        r_ours = RSA().rsa(X, X).item()
         r_scipy = self._scipy_rsa(X.numpy(), X.numpy())
         assert abs(r_ours - r_scipy) < 1e-4
 
     def test_random_pair_matches_scipy(self):
-        import numpy as np
         torch.manual_seed(2)
         X = torch.randn(30, 64)
         Y = torch.randn(30, 64)
-        r_ours = rsa(X, Y).item()
+        r_ours = RSA().rsa(X, Y).item()
         r_scipy = self._scipy_rsa(X.numpy(), Y.numpy())
         assert abs(r_ours - r_scipy) < 1e-3
 
     def test_euclidean_metric_matches_scipy(self):
-        import numpy as np
         torch.manual_seed(3)
         X = torch.randn(30, 64)
         Y = torch.randn(30, 64)
-        r_ours = rsa(X, Y, rdm_metric="euclidean").item()
+        r_ours = RSA(rdm_metric="euclidean").rsa(X, Y).item()
         r_scipy = self._scipy_rsa(X.numpy(), Y.numpy(), metric="euclidean")
         assert abs(r_ours - r_scipy) < 1e-3
