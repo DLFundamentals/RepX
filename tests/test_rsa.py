@@ -6,7 +6,7 @@ Run with:  pytest tests/
 import pytest
 import torch
 
-from letorch.rsa import RSA
+from letorch.alignment.rsa import RSA
 
 
 # ---------------------------------------------------------------------------

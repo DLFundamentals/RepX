@@ -6,7 +6,7 @@ Run with:  pytest tests/
 import pytest
 import torch
 
-from letorch.cka import CKA
+from letorch.alignment.cka import CKA
 
 
 # ---------------------------------------------------------------------------
