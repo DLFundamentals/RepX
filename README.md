@@ -1,8 +1,8 @@
 # LeTorch
 
-PyTorch-native **Representation Similarity Analysis (RSA)** with GPU support.
+PyTorch-native **Representation Similarity Analysis (RSA)** and **Centered Kernel Alignment (CKA)** with GPU support.
 
-RSA measures how similarly two sets of neural representations organize the same stimuli, by correlating their pairwise dissimilarity structures.
+Both metrics measure how similarly two sets of neural representations organize the same stimuli.
 
 ## Installation
 
@@ -11,6 +11,8 @@ pip install letorch
 ```
 
 ## Quick Start
+
+### RSA
 
 ```python
 import torch
@@ -30,7 +32,25 @@ print(r.item())   # scalar in [−1, +1]
 r_gpu = rsa.rsa(X.cuda(), Y.cuda())
 ```
 
-## API
+### CKA
+
+```python
+import torch
+from letorch import CKA
+
+X = torch.randn(50, 512)
+Y = torch.randn(50, 768)
+
+cka = CKA(kernel="linear")
+
+score = cka.cka(X, Y)
+print(score.item())   # scalar in [0, 1]
+
+# GPU
+score_gpu = cka.cka(X.cuda(), Y.cuda())
+```
+
+## RSA API
 
 ### `RSA(rdm_metric="correlation", compare="spearman")`
 
@@ -62,10 +82,39 @@ Extract the strict upper triangle of an RDM as a flat 1-D vector of length `n*(n
 
 Full RSA pipeline: build RDMs → vectorise upper triangles → correlate, using the instance's `rdm_metric` and `compare` settings.
 
-Returns a scalar tensor. Call `.item()` for a Python float.
+Returns a scalar tensor in `[−1, +1]`. Call `.item()` for a Python float.
+
+## CKA API
+
+### `CKA(kernel="linear")`
+
+Instantiate a CKA object. Uses the debiased HSIC estimator (Kornblith et al., 2019) to avoid score inflation when the number of features exceeds the number of stimuli.
+
+| Argument | Options | Default |
+|---|---|---|
+| `kernel` | `"linear"` | `"linear"` |
+
+### `CKA.compute_kernel(X) → Tensor`
+
+Compute the kernel (Gram) matrix K = X @ Xᵀ. Returns a symmetric `(n_stimuli, n_stimuli)` PSD tensor.
+
+### `CKA.cka(X, Y) → Tensor`
+
+Compute CKA: build kernel matrices → zero diagonals → normalised debiased HSIC.
+
+Requires at least 4 stimuli. Returns a scalar tensor. Call `.item()` for a Python float.
+
+## RSA vs CKA
+
+| | RSA | CKA |
+|---|---|---|
+| **Range** | [−1, +1] | [0, +1] |
+| **Invariant to** | scaling, translation (correlation metric) | orthogonal transforms, isotropic scaling |
+| **Based on** | pairwise distance vectors + rank correlation | kernel matrices + normalised inner product |
+| **Bias correction** | — | debiased HSIC (handles d >> n) |
 
 ## Why PyTorch?
 
-- All operations — RDM construction, ranking, correlation — run on **GPU** when tensors are on GPU
+- All operations run on **GPU** when tensors are on GPU
 - No `scipy` dependency at runtime
 - Integrates naturally into PyTorch model evaluation loops and `torch.no_grad()` blocks
