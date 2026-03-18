@@ -5,13 +5,12 @@ Run with:  pytest tests/
 
 import pytest
 import torch
-
 from letorch.alignment.cka import CKA
-
 
 # ---------------------------------------------------------------------------
 # compute_kernel
 # ---------------------------------------------------------------------------
+
 
 class TestComputeKernel:
     def test_output_shape(self):
@@ -39,6 +38,7 @@ class TestComputeKernel:
 # cka — identical matrices (score = 1.0)
 # ---------------------------------------------------------------------------
 
+
 class TestCKAIdentical:
     def test_identical(self):
         X = torch.randn(30, 64)
@@ -54,6 +54,7 @@ class TestCKAIdentical:
 # cka — invariances (linear kernel)
 # ---------------------------------------------------------------------------
 
+
 class TestCKAInvariances:
     def test_isotropic_scaling(self):
         """Linear CKA is invariant to isotropic scaling of rows."""
@@ -65,7 +66,7 @@ class TestCKAInvariances:
         torch.manual_seed(0)
         X = torch.randn(50, 64)
         M = torch.randn(64, 64)
-        Q, _ = torch.linalg.qr(M)      # 64×64 orthogonal matrix
+        Q, _ = torch.linalg.qr(M)  # 64×64 orthogonal matrix
         Y = X @ Q
         assert abs(CKA().cka(X, Y).item() - 1.0) < 1e-4
 
@@ -82,6 +83,7 @@ class TestCKAInvariances:
 # ---------------------------------------------------------------------------
 # cka — orthogonal / independent matrices (score ≈ 0)
 # ---------------------------------------------------------------------------
+
 
 class TestCKAOrthogonal:
     def test_independent_random_near_zero(self):
@@ -106,12 +108,13 @@ class TestCKAOrthogonal:
 # cka — different feature dimensionalities
 # ---------------------------------------------------------------------------
 
+
 class TestCKAMixedDims:
     def test_different_feature_dims(self):
         X = torch.randn(30, 64)
         Y = torch.randn(30, 256)
         score = CKA().cka(X, Y)
-        assert score.shape == torch.Size([])   # scalar
+        assert score.shape == torch.Size([])  # scalar
 
     def test_mismatched_stimuli_raises(self):
         with pytest.raises(ValueError, match="same number of stimuli"):
@@ -121,6 +124,7 @@ class TestCKAMixedDims:
 # ---------------------------------------------------------------------------
 # cka — error handling
 # ---------------------------------------------------------------------------
+
 
 class TestCKAErrors:
     def test_unknown_kernel_raises(self):
@@ -135,6 +139,7 @@ class TestCKAErrors:
 # ---------------------------------------------------------------------------
 # cka — GPU (skipped if CUDA unavailable)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
 class TestCKAGPU:
@@ -155,12 +160,14 @@ class TestCKAGPU:
 # Cross-validation against NumPy reference implementation
 # ---------------------------------------------------------------------------
 
+
 class TestCKAVsNumpy:
     """Verify PyTorch results match a NumPy reference implementation."""
 
     @staticmethod
     def _numpy_cka(X_np, Y_np):
         import numpy as np
+
         K = X_np @ X_np.T
         L = Y_np @ Y_np.T
         np.fill_diagonal(K, 0.0)

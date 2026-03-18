@@ -18,6 +18,7 @@ __all__ = ["RSA"]
 # Internal: pairwise distance kernels
 # ---------------------------------------------------------------------------
 
+
 def _correlation_rdm(X: torch.Tensor) -> torch.Tensor:
     """1 − Pearson-r for every pair of rows (= cosine distance on row-centred X)."""
     X_c = X - X.mean(dim=1, keepdim=True)
@@ -48,15 +49,16 @@ def _cityblock_rdm(X: torch.Tensor) -> torch.Tensor:
 
 _METRICS: dict[str, object] = {
     "correlation": _correlation_rdm,
-    "cosine":      _cosine_rdm,
-    "euclidean":   _euclidean_rdm,
-    "cityblock":   _cityblock_rdm,
+    "cosine": _cosine_rdm,
+    "euclidean": _euclidean_rdm,
+    "cityblock": _cityblock_rdm,
 }
 
 
 # ---------------------------------------------------------------------------
 # Internal: rank correlation helpers
 # ---------------------------------------------------------------------------
+
 
 def _rank(x: torch.Tensor) -> torch.Tensor:
     """Return 0-based dense ranks of a 1-D tensor.
@@ -87,6 +89,7 @@ def _spearmanr(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 class RSA:
     """Representational Similarity Analysis in PyTorch.
@@ -123,7 +126,9 @@ class RSA:
 
     def __init__(
         self,
-        rdm_metric: Literal["correlation", "cosine", "euclidean", "cityblock"] = "correlation",
+        rdm_metric: Literal[
+            "correlation", "cosine", "euclidean", "cityblock"
+        ] = "correlation",
         compare: Literal["spearman", "pearson"] = "spearman",
     ) -> None:
         if rdm_metric not in _METRICS:

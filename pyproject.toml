@@ -5,20 +5,33 @@ build-backend = "hatchling.build"
 [project]
 name = "letorch"
 version = "0.1.1"
-description = "PyTorch-native Representation Similarity Analysis (RSA) with GPU support"
+description = "PyTorch-native tools for evaluating learned representations"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.9"
+
 authors = [
   { name = "Nishit Aggarwal" },
+  { name = "Achleshwar Luthra"},
 ]
-keywords = ["neuroscience", "representation", "similarity", "RSA", "pytorch", "deep learning"]
+
+keywords = [
+  "representation-learning",
+  "self-supervised-learning",
+  "pytorch",
+  "deep-learning",
+]
+
 classifiers = [
   "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
   "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
   "Operating System :: OS Independent",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
+
 dependencies = [
   "torch>=2.0",
 ]
@@ -26,13 +39,56 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "pytest>=7",
+  "pytest-cov",
+  "ruff>=0.4",
+  "mypy",
+  "pre-commit",
   "numpy",
-  "scipy",   # only used in tests to cross-validate results
+  "scipy",
+]
+
+docs = [
+  "mkdocs",
+  "mkdocs-material",
+  "mkdocstrings[python]",
 ]
 
 [project.urls]
-Homepage = "https://github.com/nishit/letorch"
-Issues   = "https://github.com/nishit/letorch/issues"
+Homepage = "https://github.com/DLFundamentals/LeTorch"
+Issues   = "https://github.com/DLFundamentals/LeTorch/issues"
 
+# -------------------------
+# Hatch config
+# -------------------------
 [tool.hatch.build.targets.wheel]
 packages = ["src/letorch"]
+
+# -------------------------
+# Ruff (lint + format)
+# -------------------------
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# -------------------------
+# Pytest
+# -------------------------
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+# -------------------------
+# Mypy (optional but useful)
+# -------------------------
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+exclude = ["tests/"]
+follow_imports = "skip"

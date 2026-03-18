@@ -5,21 +5,20 @@ Run with:  pytest tests/
 
 import pytest
 import torch
-
 from letorch.alignment.rsa import RSA
-
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _orthogonal_pair(n: int = 50, d_total: int = 256, seed: int = 0):
     """Return two matrices from orthogonal column subspaces."""
     g = torch.Generator()
     g.manual_seed(seed)
     M = torch.randn(n, d_total, generator=g)
-    Q, _ = torch.linalg.qr(M.T)   # (d_total, n)
-    Q = Q.T                         # (n, d_total)
+    Q, _ = torch.linalg.qr(M.T)  # (d_total, n)
+    Q = Q.T  # (n, d_total)
     d = d_total // 2
     return Q[:, :d], Q[:, d:]
 
@@ -28,24 +27,31 @@ def _orthogonal_pair(n: int = 50, d_total: int = 256, seed: int = 0):
 # compute_rdm
 # ---------------------------------------------------------------------------
 
+
 class TestComputeRDM:
     def test_output_shape(self):
         X = torch.randn(20, 64)
         assert RSA().compute_rdm(X).shape == (20, 20)
 
-    @pytest.mark.parametrize("metric", ["correlation", "cosine", "euclidean", "cityblock"])
+    @pytest.mark.parametrize(
+        "metric", ["correlation", "cosine", "euclidean", "cityblock"]
+    )
     def test_diagonal_zero(self, metric):
         X = torch.randn(20, 64)
         rdm = RSA(rdm_metric=metric).compute_rdm(X)
         assert rdm.diagonal().abs().max().item() < 1e-5
 
-    @pytest.mark.parametrize("metric", ["correlation", "cosine", "euclidean", "cityblock"])
+    @pytest.mark.parametrize(
+        "metric", ["correlation", "cosine", "euclidean", "cityblock"]
+    )
     def test_symmetry(self, metric):
         X = torch.randn(20, 64)
         rdm = RSA(rdm_metric=metric).compute_rdm(X)
         assert (rdm - rdm.T).abs().max().item() < 1e-5
 
-    @pytest.mark.parametrize("metric", ["correlation", "cosine", "euclidean", "cityblock"])
+    @pytest.mark.parametrize(
+        "metric", ["correlation", "cosine", "euclidean", "cityblock"]
+    )
     def test_non_negative(self, metric):
         X = torch.randn(20, 64)
         assert RSA(rdm_metric=metric).compute_rdm(X).min().item() >= -1e-6
@@ -58,6 +64,7 @@ class TestComputeRDM:
 # ---------------------------------------------------------------------------
 # rdm_upper_tri
 # ---------------------------------------------------------------------------
+
 
 class TestRdmUpperTri:
     def test_length(self):
@@ -79,14 +86,19 @@ class TestRdmUpperTri:
 # rsa — identical matrices (upper bound = 1.0)
 # ---------------------------------------------------------------------------
 
+
 class TestRSAIdentical:
-    @pytest.mark.parametrize("metric", ["correlation", "cosine", "euclidean", "cityblock"])
+    @pytest.mark.parametrize(
+        "metric", ["correlation", "cosine", "euclidean", "cityblock"]
+    )
     def test_identical_spearman(self, metric):
         X = torch.randn(30, 64)
         r = RSA(rdm_metric=metric, compare="spearman").rsa(X, X)
         assert abs(r.item() - 1.0) < 1e-4, f"metric={metric}: r={r.item()}"
 
-    @pytest.mark.parametrize("metric", ["correlation", "cosine", "euclidean", "cityblock"])
+    @pytest.mark.parametrize(
+        "metric", ["correlation", "cosine", "euclidean", "cityblock"]
+    )
     def test_identical_pearson(self, metric):
         X = torch.randn(30, 64)
         r = RSA(rdm_metric=metric, compare="pearson").rsa(X, X)
@@ -96,6 +108,7 @@ class TestRSAIdentical:
 # ---------------------------------------------------------------------------
 # rsa — invariances (correlation-distance metric)
 # ---------------------------------------------------------------------------
+
 
 class TestRSAInvariances:
     def test_scaling_invariance(self):
@@ -116,6 +129,7 @@ class TestRSAInvariances:
 # ---------------------------------------------------------------------------
 # rsa — orthogonal matrices (near zero)
 # ---------------------------------------------------------------------------
+
 
 class TestRSAOrthogonal:
     def test_independent_random_near_zero(self):
@@ -141,12 +155,13 @@ class TestRSAOrthogonal:
 # rsa — different feature dimensionalities
 # ---------------------------------------------------------------------------
 
+
 class TestRSAMixedDims:
     def test_different_feature_dims(self):
         X = torch.randn(30, 64)
         Y = torch.randn(30, 256)
         r = RSA().rsa(X, Y)
-        assert r.shape == torch.Size([])   # scalar
+        assert r.shape == torch.Size([])  # scalar
 
     def test_mismatched_stimuli_raises(self):
         with pytest.raises(ValueError, match="same number of stimuli"):
@@ -156,6 +171,7 @@ class TestRSAMixedDims:
 # ---------------------------------------------------------------------------
 # rsa — error handling
 # ---------------------------------------------------------------------------
+
 
 class TestRSAErrors:
     def test_unknown_compare_raises(self):
@@ -170,6 +186,7 @@ class TestRSAErrors:
 # ---------------------------------------------------------------------------
 # rsa — GPU (skipped if CUDA unavailable)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
 class TestRSAGPU:
@@ -193,6 +210,7 @@ class TestRSAGPU:
 try:
     from scipy.spatial.distance import pdist, squareform
     from scipy.stats import spearmanr as scipy_spearmanr
+
     _SCIPY = True
 except ImportError:
     _SCIPY = False
@@ -204,6 +222,7 @@ class TestRSAVsScipy:
 
     def _scipy_rsa(self, X_np, Y_np, metric="correlation"):
         import numpy as np
+
         rdm_x = squareform(pdist(X_np, metric=metric))
         rdm_y = squareform(pdist(Y_np, metric=metric))
         n = rdm_x.shape[0]

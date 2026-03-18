@@ -20,6 +20,7 @@ __all__ = ["CKA"]
 # Internal: kernel functions
 # ---------------------------------------------------------------------------
 
+
 def _linear_kernel(X: torch.Tensor) -> torch.Tensor:
     """Linear (dot-product) kernel: K = X @ X.T"""
     return X @ X.T
@@ -33,6 +34,7 @@ _KERNELS: dict[str, object] = {
 # ---------------------------------------------------------------------------
 # Internal: debiased HSIC estimator
 # ---------------------------------------------------------------------------
+
 
 def _hsic_unbiased(K: torch.Tensor, L: torch.Tensor) -> torch.Tensor:
     """Unbiased HSIC estimator (Kornblith et al., 2019).
@@ -55,6 +57,7 @@ def _hsic_unbiased(K: torch.Tensor, L: torch.Tensor) -> torch.Tensor:
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 class CKA:
     """Centered Kernel Alignment in PyTorch.
