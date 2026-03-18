@@ -32,35 +32,47 @@ pytest tests/
 ## 🛠️ Development Guidelines
 
 ### Before writing code
+
 - Check existing structure (`alignment/`, `geometry/`, `accuracy/`)
 - Follow the same style and API patterns
 - Keep functions simple and modular
 
 ### Adding a new metric (example: CKA)
+
 1. Create a new file `cka.py` in the appropriate submodule (e.g., `alignment/`).
+
 ```bash
 src/letorch/alignment/cka.py
 ```
+
 2. Implement the metric as a function:
+
 ```python
 def cka(X: torch.Tensor, Y: torch.Tensor) -> float:
     # Implementation here
     pass
 ```
+
 3. Add tests and run them:
+
 ```bash
 tests/test_alignment/test_cka.py
 ```
+
 4. Export it in `src/letorch/__init__.py`:
+
 ```python
 from .alignment.cka import cka
 ```
+
 5. Update documentation if necessary.
 
 ## 🧪 Testing
+
 - Use `pytest` for testing.
 
 ## Project structure
+
 ```
 src/letorch/
 ├── alignment/
@@ -73,11 +85,13 @@ tests/
 ## 🔀 Pull Requests
 
 Before submitting a PR:
+
 - Run tests (`pytest tests/`)
 - Run pre-commit hooks (`pre-commit run --all-files`)
 - Make sure CI passes
 
 PRs should:
+
 - Be focused (one feature/bugfix per PR)
 - Include tests for new features/bugfixes
 - Follow the existing code style
