@@ -30,8 +30,9 @@ dev = [
   "scipy",   # only used in tests to cross-validate results
 ]
 docs = [
-  "mkdocs>=1.6",
-  "mkdocstrings[python]>=0.30",
+  "mkdocs>=1.6,<2.0",
+  "mkdocs-material>=9.5,<10.0",
+  "mkdocstrings[python]>=0.30,<1.0",
 ]
 
 [project.urls]

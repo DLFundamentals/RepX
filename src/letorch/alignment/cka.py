@@ -1,21 +1,7 @@
-"""letorch.alignment.cka — Centered Kernel Alignment in PyTorch.
+"""Centered Kernel Alignment (CKA) in PyTorch.
 
-Centered Kernel Alignment (CKA) is a representation similarity metric that
-measures how similarly two sets of neural representations organize the same
-stimuli. This implementation uses the debiased HSIC (Hilbert–Schmidt
-Independence Criterion) estimator from Kornblith et al. (2019) to avoid score
-inflation when the number of features is much larger than the number of stimuli.
-
-Device Support
---------------
-All operations are device-agnostic: pass GPU tensors and everything runs on
-the GPU with no code changes.
-
-References
-----------
-Kornblith, S., Norouzi, M., Lee, H., & Hinton, G. (2019).
-Similarity of neural network representations revisited.
-International Conference on Machine Learning (ICML).
+This module provides kernel-based representational comparison utilities and
+the `CKA` class.
 """
 
 from __future__ import annotations
@@ -106,14 +92,8 @@ def _hsic_unbiased(K: torch.Tensor, L: torch.Tensor) -> torch.Tensor:
 class CKA:
     """Centered Kernel Alignment in PyTorch.
 
-    CKA measures similarity between two representations using centered kernel
-    alignment. Uses the debiased HSIC (Hilbert–Schmidt Independence Criterion)
-    estimator to produce unbiased scores in [0, 1] that correctly handle the
-    case where the number of features exceeds the number of stimuli.
-
-    The linear kernel with centering is invariant to orthogonal transformations
-    and isotropic scaling of features, making it useful for comparing neural
-    network representations that may have different scales or rotations.
+    Compares two representation spaces with centered kernel alignment using
+    the debiased HSIC estimator.
 
     Parameters
     ----------
@@ -123,27 +103,10 @@ class CKA:
         - "linear": K = X @ X^T (dot-product kernel). Invariant to
           orthogonal transformations and isotropic scaling of rows.
 
-    Attributes
-    ----------
-    kernel : str
-        The kernel type used for similarity computation.
-
-    Examples
-    --------
-    >>> import torch
-    >>> from letorch.alignment import CKA
-    >>> cka = CKA()
-    >>> X = torch.randn(50, 128)
-    >>> Y = torch.randn(50, 256)
-    >>> cka.cka(X, X).item()   # identical → 1.0
-    1.0
-    >>> cka.cka(X, Y).item()   # independent → ≈ 0.0
-
     Notes
     -----
-    Requires at least 4 stimuli (rows) due to the n*(n-3) denominator in
-    the unbiased HSIC estimator. This is particularly important for obtaining
-    valid results when feature dimensionality exceeds stimulus count.
+    - Invariant to orthogonal transforms and isotropic scaling with linear kernel.
+    - Requires at least 4 stimuli (rows).
 
     References
     ----------
@@ -153,19 +116,6 @@ class CKA:
     """
 
     def __init__(self, kernel: Literal["linear"] = "linear") -> None:
-        """Initialize CKA with specified kernel type.
-
-        Parameters
-        ----------
-        kernel : {"linear"}
-            Kernel type for similarity computation. Currently only "linear"
-            (dot-product kernel K = X @ X^T) is supported.
-
-        Raises
-        ------
-        ValueError
-            If kernel type is not supported.
-        """
         if kernel not in _KERNELS:
             raise ValueError(
                 f"Unknown kernel '{kernel}'. Choose from {sorted(_KERNELS)}."

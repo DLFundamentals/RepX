@@ -1,0 +1,39 @@
+site_name: LeTorch
+site_description: PyTorch-native tools for neural representation analysis
+site_url: https://github.com/nishit/letorch
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+
+nav:
+  - Home: index.md
+  - Reference:
+      - Alignment: api/alignment.md
+      - Accuracy: api/accuracy.md
+      - Core: api/core.md
+      - Geometry: api/geometry.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths:
+            - src
+          options:
+            docstring_style: google
+            show_source: false
+            heading_level: 2
+            merge_init_into_class: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true

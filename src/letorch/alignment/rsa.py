@@ -1,22 +1,7 @@
-"""letorch.alignment.rsa — Representation Similarity Analysis in PyTorch.
+"""Representation Similarity Analysis (RSA) in PyTorch.
 
-Representation Similarity Analysis (RSA) measures the similarity between
-two sets of neural representations by comparing their Representational
-Dissimilarity Matrices (RDMs). It works by computing pairwise distances
-between stimuli in each representation space, then correlating these distance
-structures to quantify representational similarity.
-
-Supported Metrics
------------------
-- correlation: 1 − Pearson r (row-wise scaling and translation invariant)
-- cosine: 1 − cosine similarity (row-wise scaling invariant)
-- euclidean: L2 distance
-- cityblock: L1 / Manhattan distance
-
-Device Support
---------------
-All operations are device-agnostic: pass GPU tensors and everything runs on
-the GPU with no code changes.
+This module provides distance-based representational comparison utilities and
+the `RSA` class.
 """
 
 from __future__ import annotations
@@ -193,10 +178,8 @@ def _spearmanr(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 class RSA:
     """Representational Similarity Analysis in PyTorch.
 
-    RSA measures the similarity of two representation spaces by comparing their
-    Representational Dissimilarity Matrices (RDMs). Two matrices with identical
-    structure (relatedness of stimuli) yield high correlation, while independent
-    representations yield correlation near 0.
+    Compares two representation spaces by correlating their
+    Representational Dissimilarity Matrices (RDMs).
 
     Parameters
     ----------
@@ -212,23 +195,10 @@ class RSA:
     compare : {"spearman", "pearson"}
         Correlation method used when comparing RDM vectors. Default: "spearman".
 
-    Attributes
-    ----------
-    rdm_metric : str
-        The distance metric used for RDM computation.
-    compare : str
-        The correlation method used for comparing RDMs.
-
-    Examples
-    --------
-    >>> import torch
-    >>> from letorch.alignment import RSA
-    >>> rsa = RSA(rdm_metric="correlation", compare="spearman")
-    >>> X = torch.randn(50, 128)
-    >>> Y = torch.randn(50, 256)
-    >>> rsa.rsa(X, X).item()   # identical → 1.0
-    1.0
-    >>> rsa.rsa(X, Y).item()   # independent → ≈ 0.0
+    Notes
+    -----
+    - Identical representations produce scores near 1.
+    - Independent representations usually produce scores near 0.
     """
 
     def __init__(
@@ -236,20 +206,6 @@ class RSA:
         rdm_metric: Literal["correlation", "cosine", "euclidean", "cityblock"] = "correlation",
         compare: Literal["spearman", "pearson"] = "spearman",
     ) -> None:
-        """Initialize RSA with specified RDM metric and comparison method.
-
-        Parameters
-        ----------
-        rdm_metric : {"correlation", "cosine", "euclidean", "cityblock"}
-            Distance metric for RDM computation. Default: "correlation".
-        compare : {"spearman", "pearson"}
-            Correlation method for comparing RDM vectors. Default: "spearman".
-
-        Raises
-        ------
-        ValueError
-            If rdm_metric is not a supported metric or compare is not a supported method.
-        """
         if rdm_metric not in _METRICS:
             raise ValueError(
                 f"Unknown metric '{rdm_metric}'. Choose from {sorted(_METRICS)}."
