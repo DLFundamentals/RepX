@@ -1,7 +1,7 @@
-"""letorch.rsa — Representation Similarity Analysis in PyTorch.
+"""Representation Similarity Analysis (RSA) in PyTorch.
 
-All operations are device-agnostic: pass GPU tensors and everything
-runs on the GPU with no code changes.
+This module provides distance-based representational comparison utilities and
+the `RSA` class.
 """
 
 from __future__ import annotations
@@ -20,7 +20,14 @@ __all__ = ["RSA"]
 
 
 def _correlation_rdm(X: torch.Tensor) -> torch.Tensor:
-    """1 − Pearson-r for every pair of rows (= cosine distance on row-centred X)."""
+    """Compute correlation-distance RDM.
+
+    Args:
+        X: Input tensor of shape `(n_stimuli, n_features)`.
+
+    Returns:
+        Tensor of shape `(n_stimuli, n_stimuli)` with zero diagonal.
+    """
     X_c = X - X.mean(dim=1, keepdim=True)
     norms = X_c.norm(dim=1, keepdim=True).clamp(min=1e-8)
     X_n = X_c / norms
@@ -30,7 +37,14 @@ def _correlation_rdm(X: torch.Tensor) -> torch.Tensor:
 
 
 def _cosine_rdm(X: torch.Tensor) -> torch.Tensor:
-    """1 − cosine similarity for every pair of rows."""
+    """Compute cosine-distance RDM.
+
+    Args:
+        X: Input tensor of shape `(n_stimuli, n_features)`.
+
+    Returns:
+        Tensor of shape `(n_stimuli, n_stimuli)` with zero diagonal.
+    """
     X_n = F.normalize(X, p=2, dim=1)
     dist = 1.0 - (X_n @ X_n.T)
     dist.fill_diagonal_(0.0)
@@ -38,12 +52,26 @@ def _cosine_rdm(X: torch.Tensor) -> torch.Tensor:
 
 
 def _euclidean_rdm(X: torch.Tensor) -> torch.Tensor:
-    """L2 distance for every pair of rows."""
+    """Compute Euclidean-distance RDM.
+
+    Args:
+        X: Input tensor of shape `(n_stimuli, n_features)`.
+
+    Returns:
+        Tensor of shape `(n_stimuli, n_stimuli)` with pairwise L2 distances.
+    """
     return torch.cdist(X, X, p=2)
 
 
 def _cityblock_rdm(X: torch.Tensor) -> torch.Tensor:
-    """L1 / Manhattan distance for every pair of rows."""
+    """Compute Manhattan-distance RDM.
+
+    Args:
+        X: Input tensor of shape `(n_stimuli, n_features)`.
+
+    Returns:
+        Tensor of shape `(n_stimuli, n_stimuli)` with pairwise L1 distances.
+    """
     return torch.cdist(X, X, p=1)
 
 
@@ -61,7 +89,7 @@ _METRICS: dict[str, object] = {
 
 
 def _rank(x: torch.Tensor) -> torch.Tensor:
-    """Return 0-based dense ranks of a 1-D tensor.
+    """Return 0-based dense ranks for a 1-D tensor.
 
     Ties are broken by order-of-appearance (consistent with
     scipy's default for continuous data, where ties are vanishingly rare).
@@ -70,7 +98,7 @@ def _rank(x: torch.Tensor) -> torch.Tensor:
 
 
 def _pearsonr(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-    """Pearson correlation coefficient between two 1-D tensors."""
+    """Compute Pearson correlation for two 1-D tensors."""
     xm = x - x.mean()
     ym = y - y.mean()
     denom = xm.norm() * ym.norm()
@@ -82,7 +110,7 @@ def _pearsonr(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 
 
 def _spearmanr(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
-    """Spearman rank correlation between two 1-D tensors."""
+    """Compute Spearman correlation for two 1-D tensors."""
     return _pearsonr(_rank(x), _rank(y))
 
 
@@ -94,34 +122,23 @@ def _spearmanr(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
 class RSA:
     """Representational Similarity Analysis in PyTorch.
 
+    Compares two representation spaces by correlating their
+    Representational Dissimilarity Matrices (RDMs).
+
     Parameters
     ----------
-    rdm_metric : str
+    rdm_metric : {"correlation", "cosine", "euclidean", "cityblock"}
         Pairwise distance metric used when building RDMs.
-
-        ``'correlation'`` (default)
-            1 − Pearson r between rows.  Invariant to row-wise scaling
-            and translation.
-        ``'cosine'``
-            1 − cosine similarity.  Invariant to row-wise scaling.
-        ``'euclidean'``
-            L2 distance.
-        ``'cityblock'``
-            L1 / Manhattan distance.
-    compare : str
+        Options: ``"correlation"`` (1 − Pearson r), ``"cosine"``
+        (1 − cosine similarity), ``"euclidean"`` (L2 distance),
+        and ``"cityblock"`` (L1/Manhattan distance).
+    compare : {"spearman", "pearson"}
         Correlation method used when comparing RDM vectors.
-        ``'spearman'`` (default) or ``'pearson'``.
 
-    Examples
-    --------
-    >>> import torch
-    >>> from letorch.rsa import RSA
-    >>> rsa = RSA(rdm_metric="correlation", compare="spearman")
-    >>> X = torch.randn(50, 128)
-    >>> Y = torch.randn(50, 256)
-    >>> rsa.rsa(X, X).item()   # identical → 1.0
-    1.0
-    >>> rsa.rsa(X, Y).item()   # independent → ≈ 0.0
+    Notes
+    -----
+    - Identical representations produce scores near 1.
+    - Independent representations usually produce scores near 0.
     """
 
     def __init__(
@@ -147,13 +164,24 @@ class RSA:
 
         Parameters
         ----------
-        X : Tensor, shape ``(n_stimuli, n_features)``
+        X : Tensor, shape (n_stimuli, n_features)
             One row per stimulus.
 
         Returns
         -------
-        rdm : Tensor, shape ``(n_stimuli, n_stimuli)``
+        rdm : Tensor, shape (n_stimuli, n_stimuli)
             Symmetric matrix with zero diagonal.
+
+        Examples
+        --------
+        ```python
+        import torch
+        from letorch.alignment import RSA
+
+        X = torch.randn(5, 3)
+        rdm = RSA(rdm_metric="correlation").compute_rdm(X)
+        print(rdm.shape)  # torch.Size([5, 5])
+        ```
         """
         return _METRICS[self.rdm_metric](X)  # type: ignore[operator]
 
@@ -162,11 +190,24 @@ class RSA:
 
         Parameters
         ----------
-        rdm : Tensor, shape ``(n, n)``
+        rdm : Tensor, shape (n, n)
 
         Returns
         -------
-        vec : Tensor, shape ``(n*(n-1)//2,)``
+        vec : Tensor, shape (n*(n-1)//2,)
+
+        Examples
+        --------
+        ```python
+        import torch
+        from letorch.alignment import RSA
+
+        rdm = torch.tensor(
+            [[0.0, 1.0, 2.0], [1.0, 0.0, 3.0], [2.0, 3.0, 0.0]]
+        )
+        vec = RSA().rdm_upper_tri(rdm)
+        print(vec)  # tensor([1., 2., 3.])
+        ```
         """
         n = rdm.shape[0]
         rows, cols = torch.triu_indices(n, n, offset=1, device=rdm.device)
@@ -180,15 +221,34 @@ class RSA:
 
         Parameters
         ----------
-        X, Y : Tensor, shape ``(n_stimuli, n_features_*)``
+        X, Y : Tensor, shape (n_stimuli, n_features_*)
             Row-per-stimulus matrices.  Both must have the same number of rows;
             feature dimensionalities may differ.
 
         Returns
         -------
         r : scalar Tensor
-            Correlation coefficient in ``[−1, +1]``.
+            Correlation coefficient in [−1, +1].
             Call ``.item()`` to get a Python float.
+
+        Raises
+        ------
+        ValueError
+            If X and Y have different number of stimuli.
+
+        Examples
+        --------
+        ```python
+        import torch
+        from letorch.alignment import RSA
+
+        rsa = RSA(rdm_metric="correlation", compare="spearman")
+        X = torch.randn(20, 64)
+        Y = torch.randn(20, 128)
+
+        score = rsa.rsa(X, Y)
+        print(score.shape)  # torch.Size([])
+        ```
         """
         if X.shape[0] != Y.shape[0]:
             raise ValueError(

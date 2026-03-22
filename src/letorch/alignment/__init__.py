@@ -1,7 +1,9 @@
-"""letorch.alignment — Alignment-based representation metrics."""
+"""Alignment-based representation metrics.
 
-from .cka import CKA
+This subpackage exposes:
+- RSA: Representation Similarity Analysis.
+- CKA: Centered Kernel Alignment.
+"""
+
 from .rsa import RSA
-
-__version__ = "0.1.1"
-__all__ = ["RSA", "CKA"]
+from .cka import CKA

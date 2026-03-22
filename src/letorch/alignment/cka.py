@@ -1,10 +1,7 @@
-"""letorch.cka — Centered Kernel Alignment in PyTorch.
+"""Centered Kernel Alignment (CKA) in PyTorch.
 
-Uses the debiased HSIC estimator (Kornblith et al., 2019) to avoid score
-inflation when the number of features d is much larger than stimuli n.
-
-All operations are device-agnostic: pass GPU tensors and everything
-runs on the GPU with no code changes.
+This module provides kernel-based representational comparison utilities and
+the `CKA` class.
 """
 
 from __future__ import annotations
@@ -22,7 +19,7 @@ __all__ = ["CKA"]
 
 
 def _linear_kernel(X: torch.Tensor) -> torch.Tensor:
-    """Linear (dot-product) kernel: K = X @ X.T"""
+    """Compute linear kernel matrix `K = X @ X.T`."""
     return X @ X.T
 
 
@@ -37,9 +34,9 @@ _KERNELS: dict[str, object] = {
 
 
 def _hsic_unbiased(K: torch.Tensor, L: torch.Tensor) -> torch.Tensor:
-    """Unbiased HSIC estimator (Kornblith et al., 2019).
+    """Compute unbiased HSIC estimator.
 
-    K and L must have their diagonals pre-zeroed before calling this.
+    K and L must have zeroed diagonals before calling this.
 
     The estimator is:
 
@@ -62,28 +59,22 @@ def _hsic_unbiased(K: torch.Tensor, L: torch.Tensor) -> torch.Tensor:
 class CKA:
     """Centered Kernel Alignment in PyTorch.
 
-    Uses the debiased HSIC estimator to produce an unbiased score in [0, 1]
-    (in expectation) for independent representations.
+    Compares two representation spaces with centered kernel alignment using
+    the debiased HSIC estimator.
 
     Parameters
     ----------
     kernel : str
         Kernel used to build the similarity matrix.
 
-        ``'linear'`` (default)
+        ``"linear"`` (default)
             K = X @ Xᵀ.  Invariant to **orthogonal transformations** and
             **isotropic scaling** of the rows.
 
-    Examples
-    --------
-    >>> import torch
-    >>> from letorch.cka import CKA
-    >>> cka = CKA()
-    >>> X = torch.randn(50, 128)
-    >>> Y = torch.randn(50, 256)
-    >>> cka.cka(X, X).item()   # identical → 1.0
-    1.0
-    >>> cka.cka(X, Y).item()   # independent → ≈ 0.0
+    Notes
+    -----
+    - Invariant to orthogonal transforms and isotropic scaling with linear kernel.
+    - Requires at least 4 stimuli (rows).
     """
 
     def __init__(self, kernel: Literal["linear"] = "linear") -> None:
@@ -98,13 +89,24 @@ class CKA:
 
         Parameters
         ----------
-        X : Tensor, shape ``(n_stimuli, n_features)``
+        X : Tensor, shape (n_stimuli, n_features)
             One row per stimulus.
 
         Returns
         -------
-        K : Tensor, shape ``(n_stimuli, n_stimuli)``
+        K : Tensor, shape (n_stimuli, n_stimuli)
             Symmetric positive semi-definite kernel matrix.
+
+        Examples
+        --------
+        ```python
+        import torch
+        from letorch.alignment import CKA
+
+        X = torch.randn(4, 3)
+        K = CKA().compute_kernel(X)
+        print(K.shape)  # torch.Size([4, 4])
+        ```
         """
         return _KERNELS[self.kernel](X)  # type: ignore[operator]
 
@@ -119,7 +121,7 @@ class CKA:
 
         Parameters
         ----------
-        X, Y : Tensor, shape ``(n_stimuli, n_features_*)``
+        X, Y : Tensor, shape (n_stimuli, n_features_*)
             Row-per-stimulus matrices.  Both must have the same number of
             rows; feature dimensionalities may differ.
 
@@ -128,6 +130,25 @@ class CKA:
         score : scalar Tensor
             CKA score.  Returns 1.0 for identical representations, ≈ 0.0
             for independent ones.  Call ``.item()`` for a Python float.
+
+        Raises
+        ------
+        ValueError
+            If X and Y have different number of stimuli or n < 4.
+
+        Examples
+        --------
+        ```python
+        import torch
+        from letorch.alignment import CKA
+
+        cka = CKA(kernel="linear")
+        X = torch.randn(20, 64)
+        Y = torch.randn(20, 128)
+
+        score = cka.cka(X, Y)
+        print(score.shape)  # torch.Size([])
+        ```
         """
         if X.shape[0] != Y.shape[0]:
             raise ValueError(
