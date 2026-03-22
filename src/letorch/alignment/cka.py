@@ -1,10 +1,21 @@
-"""letorch.cka — Centered Kernel Alignment in PyTorch.
+"""letorch.alignment.cka — Centered Kernel Alignment in PyTorch.
 
-Uses the debiased HSIC estimator (Kornblith et al., 2019) to avoid score
-inflation when the number of features d is much larger than stimuli n.
+Centered Kernel Alignment (CKA) is a representation similarity metric that
+measures how similarly two sets of neural representations organize the same
+stimuli. This implementation uses the debiased HSIC (Hilbert–Schmidt
+Independence Criterion) estimator from Kornblith et al. (2019) to avoid score
+inflation when the number of features is much larger than the number of stimuli.
 
-All operations are device-agnostic: pass GPU tensors and everything
-runs on the GPU with no code changes.
+Device Support
+--------------
+All operations are device-agnostic: pass GPU tensors and everything runs on
+the GPU with no code changes.
+
+References
+----------
+Kornblith, S., Norouzi, M., Lee, H., & Hinton, G. (2019).
+Similarity of neural network representations revisited.
+International Conference on Machine Learning (ICML).
 """
 
 from __future__ import annotations
@@ -21,7 +32,21 @@ __all__ = ["CKA"]
 # ---------------------------------------------------------------------------
 
 def _linear_kernel(X: torch.Tensor) -> torch.Tensor:
-    """Linear (dot-product) kernel: K = X @ X.T"""
+    """Compute linear (dot-product) kernel matrix.
+
+    Computes the Gram matrix K = X @ X.T, representing inner products
+    between all pairs of rows.
+
+    Parameters
+    ----------
+    X : Tensor, shape (n, d)
+        Input matrix with one row per stimulus.
+
+    Returns
+    -------
+    K : Tensor, shape (n, n)
+        Symmetric positive semi-definite kernel (Gram) matrix.
+    """
     return X @ X.T
 
 
@@ -35,14 +60,36 @@ _KERNELS: dict[str, object] = {
 # ---------------------------------------------------------------------------
 
 def _hsic_unbiased(K: torch.Tensor, L: torch.Tensor) -> torch.Tensor:
-    """Unbiased HSIC estimator (Kornblith et al., 2019).
+    """Compute unbiased Hilbert–Schmidt Independence Criterion (HSIC).
 
-    K and L must have their diagonals pre-zeroed before calling this.
+    Implements the unbiased HSIC estimator from Kornblith et al. (2019),
+    which correctly estimates HSIC while avoiding bias when n >> d. Both
+    kernel matrices must have their diagonals pre-zeroed.
 
-    The estimator is:
+    The estimator formula is:
 
-        HSIC(K, L) = [ tr(KL) + (1ᵀK1)(1ᵀL1)/((n-1)(n-2))
-                       - 2/(n-2) · 1ᵀKL1 ] / (n(n-3))
+        HSIC(K, L) = [tr(KL) + (1^T K 1)(1^T L 1) / ((n-1)(n-2))
+                      - 2/(n-2) · 1^T KL 1] / (n(n-3))
+
+    where 1 is the all-ones vector.
+
+    Parameters
+    ----------
+    K, L : Tensor, shape (n, n)
+        Symmetric kernel matrices with diagonals already set to 0.
+        (Pre-zeroing is required; not done internally.)
+
+    Returns
+    -------
+    hsic : scalar Tensor
+        Unbiased HSIC estimate. Typically in [0, ∞) but can be negative
+        for very small samples.
+
+    References
+    ----------
+    Kornblith, S., Norouzi, M., Lee, H., & Hinton, G. (2019).
+    Similarity of neural network representations revisited.
+    International Conference on Machine Learning (ICML).
     """
     n = K.shape[0]
     ones = torch.ones(n, dtype=K.dtype, device=K.device)
@@ -59,31 +106,66 @@ def _hsic_unbiased(K: torch.Tensor, L: torch.Tensor) -> torch.Tensor:
 class CKA:
     """Centered Kernel Alignment in PyTorch.
 
-    Uses the debiased HSIC estimator to produce an unbiased score in [0, 1]
-    (in expectation) for independent representations.
+    CKA measures similarity between two representations using centered kernel
+    alignment. Uses the debiased HSIC (Hilbert–Schmidt Independence Criterion)
+    estimator to produce unbiased scores in [0, 1] that correctly handle the
+    case where the number of features exceeds the number of stimuli.
+
+    The linear kernel with centering is invariant to orthogonal transformations
+    and isotropic scaling of features, making it useful for comparing neural
+    network representations that may have different scales or rotations.
 
     Parameters
     ----------
-    kernel : str
-        Kernel used to build the similarity matrix.
+    kernel : {"linear"}
+        Kernel function for building similarity matrices. Default: "linear".
 
-        ``'linear'`` (default)
-            K = X @ Xᵀ.  Invariant to **orthogonal transformations** and
-            **isotropic scaling** of the rows.
+        - "linear": K = X @ X^T (dot-product kernel). Invariant to
+          orthogonal transformations and isotropic scaling of rows.
+
+    Attributes
+    ----------
+    kernel : str
+        The kernel type used for similarity computation.
 
     Examples
     --------
     >>> import torch
-    >>> from letorch.cka import CKA
+    >>> from letorch.alignment import CKA
     >>> cka = CKA()
     >>> X = torch.randn(50, 128)
     >>> Y = torch.randn(50, 256)
     >>> cka.cka(X, X).item()   # identical → 1.0
     1.0
     >>> cka.cka(X, Y).item()   # independent → ≈ 0.0
+
+    Notes
+    -----
+    Requires at least 4 stimuli (rows) due to the n*(n-3) denominator in
+    the unbiased HSIC estimator. This is particularly important for obtaining
+    valid results when feature dimensionality exceeds stimulus count.
+
+    References
+    ----------
+    Kornblith, S., Norouzi, M., Lee, H., & Hinton, G. (2019).
+    Similarity of neural network representations revisited.
+    International Conference on Machine Learning (ICML).
     """
 
     def __init__(self, kernel: Literal["linear"] = "linear") -> None:
+        """Initialize CKA with specified kernel type.
+
+        Parameters
+        ----------
+        kernel : {"linear"}
+            Kernel type for similarity computation. Currently only "linear"
+            (dot-product kernel K = X @ X^T) is supported.
+
+        Raises
+        ------
+        ValueError
+            If kernel type is not supported.
+        """
         if kernel not in _KERNELS:
             raise ValueError(
                 f"Unknown kernel '{kernel}'. Choose from {sorted(_KERNELS)}."
@@ -93,38 +175,56 @@ class CKA:
     def compute_kernel(self, X: torch.Tensor) -> torch.Tensor:
         """Compute the kernel (Gram) matrix for a set of representations.
 
+        Computes the kernel matrix using the type specified in ``__init__``.
+        For the default linear kernel, this is K = X @ X^T, a symmetric
+        positive semi-definite matrix.
+
         Parameters
         ----------
-        X : Tensor, shape ``(n_stimuli, n_features)``
-            One row per stimulus.
+        X : Tensor, shape (n_stimuli, n_features)
+            Input matrix with one row per stimulus.
 
         Returns
         -------
-        K : Tensor, shape ``(n_stimuli, n_stimuli)``
-            Symmetric positive semi-definite kernel matrix.
+        K : Tensor, shape (n_stimuli, n_stimuli)
+            Symmetric positive semi-definite kernel (Gram) matrix.
         """
         return _KERNELS[self.kernel](X)  # type: ignore[operator]
 
     def cka(self, X: torch.Tensor, Y: torch.Tensor) -> torch.Tensor:
         """Compute Centered Kernel Alignment (CKA).
 
-        Builds a kernel matrix for each representation, zeros the diagonals,
-        and computes the normalised debiased HSIC.
+        Builds kernel matrices for each input, centers them by zeroing diagonals,
+        and computes the normalised unbiased HSIC (Hilbert–Schmidt Independence
+        Criterion) using the estimator from Kornblith et al. (2019).
 
-        Requires at least 4 stimuli (rows) due to the ``n*(n-3)``
-        denominator in the unbiased HSIC estimator.
+        Requires at least 4 stimuli (rows) due to the n*(n-3) denominator in
+        the unbiased HSIC estimator.
 
         Parameters
         ----------
-        X, Y : Tensor, shape ``(n_stimuli, n_features_*)``
-            Row-per-stimulus matrices.  Both must have the same number of
-            rows; feature dimensionalities may differ.
+        X, Y : Tensor, shape (n_stimuli, n_features_*)
+            Row-per-stimulus matrices. Both must have the same number of rows;
+            feature dimensionalities may differ.
 
         Returns
         -------
         score : scalar Tensor
-            CKA score.  Returns 1.0 for identical representations, ≈ 0.0
-            for independent ones.  Call ``.item()`` for a Python float.
+            CKA score in [0, 1].
+            - 1.0 for identical representations
+            - ≈0.0 for independent representations
+            Call ``.item()`` to get a Python float.
+
+        Raises
+        ------
+        ValueError
+            If X and Y have different number of stimuli, or if either has
+            fewer than 4 stimuli.
+
+        Notes
+        -----
+        Device and dtype are preserved: if inputs are on GPU or use a specific
+        dtype, outputs will match.
         """
         if X.shape[0] != Y.shape[0]:
             raise ValueError(

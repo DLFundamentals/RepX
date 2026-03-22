@@ -29,6 +29,10 @@ dev = [
   "numpy",
   "scipy",   # only used in tests to cross-validate results
 ]
+docs = [
+  "mkdocs>=1.6",
+  "mkdocstrings[python]>=0.30",
+]
 
 [project.urls]
 Homepage = "https://github.com/nishit/letorch"
