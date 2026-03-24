@@ -1,8 +1,6 @@
-# LeTorch
+# RepX ⛵️
 
-PyTorch-native **Representation Similarity Analysis (RSA)** and **Centered Kernel Alignment (CKA)** with GPU support.
-
-Both metrics measure how similarly two sets of neural representations organize the same stimuli.
+PyTorch-native metrics for representation analysis. 
 
 ## Installation
 
