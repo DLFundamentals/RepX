@@ -74,7 +74,7 @@ class CKA:
     Notes
     -----
     - Invariant to orthogonal transforms and isotropic scaling with linear kernel.
-    - Requires at least 4 stimuli (rows).
+    - Requires at least 4 samples (rows).
     """
 
     def __init__(self, kernel: Literal["linear"] = "linear") -> None:
@@ -89,12 +89,12 @@ class CKA:
 
         Parameters
         ----------
-        X : Tensor, shape (n_stimuli, n_features)
-            One row per stimulus.
+        X : Tensor, shape (n_samples, n_features)
+            One row per sample.
 
         Returns
         -------
-        K : Tensor, shape (n_stimuli, n_stimuli)
+        K : Tensor, shape (n_samples, n_samples)
             Symmetric positive semi-definite kernel matrix.
 
         Examples
@@ -116,13 +116,13 @@ class CKA:
         Builds a kernel matrix for each representation, zeros the diagonals,
         and computes the normalised debiased HSIC.
 
-        Requires at least 4 stimuli (rows) due to the ``n*(n-3)``
+        Requires at least 4 samples (rows) due to the ``n*(n-3)``
         denominator in the unbiased HSIC estimator.
 
         Parameters
         ----------
-        X, Y : Tensor, shape (n_stimuli, n_features_*)
-            Row-per-stimulus matrices.  Both must have the same number of
+        X, Y : Tensor, shape (n_samples, n_features_*)
+            Row-per-sample matrices.  Both must have the same number of
             rows; feature dimensionalities may differ.
 
         Returns
@@ -134,7 +134,7 @@ class CKA:
         Raises
         ------
         ValueError
-            If X and Y have different number of stimuli or n < 4.
+            If X and Y have different number of samples or n < 4.
 
         Examples
         --------
@@ -152,13 +152,13 @@ class CKA:
         """
         if X.shape[0] != Y.shape[0]:
             raise ValueError(
-                f"X and Y must have the same number of stimuli (rows). "
+                f"X and Y must have the same number of samples (rows). "
                 f"Got X: {X.shape[0]}, Y: {Y.shape[0]}."
             )
         n = X.shape[0]
         if n < 4:
             raise ValueError(
-                f"At least 4 stimuli are required for the debiased HSIC "
+                f"At least 4 samples are required for the debiased HSIC "
                 f"estimator (got {n})."
             )
 

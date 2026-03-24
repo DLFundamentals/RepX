@@ -23,10 +23,10 @@ def _correlation_rdm(X: torch.Tensor) -> torch.Tensor:
     """Compute correlation-distance RDM.
 
     Args:
-        X: Input tensor of shape `(n_stimuli, n_features)`.
+        X: Input tensor of shape `(n_samples, n_features)`.
 
     Returns:
-        Tensor of shape `(n_stimuli, n_stimuli)` with zero diagonal.
+        Tensor of shape `(n_samples, n_samples)` with zero diagonal.
     """
     X_c = X - X.mean(dim=1, keepdim=True)
     norms = X_c.norm(dim=1, keepdim=True).clamp(min=1e-8)
@@ -40,10 +40,10 @@ def _cosine_rdm(X: torch.Tensor) -> torch.Tensor:
     """Compute cosine-distance RDM.
 
     Args:
-        X: Input tensor of shape `(n_stimuli, n_features)`.
+        X: Input tensor of shape `(n_samples, n_features)`.
 
     Returns:
-        Tensor of shape `(n_stimuli, n_stimuli)` with zero diagonal.
+        Tensor of shape `(n_samples, n_samples)` with zero diagonal.
     """
     X_n = F.normalize(X, p=2, dim=1)
     dist = 1.0 - (X_n @ X_n.T)
@@ -55,10 +55,10 @@ def _euclidean_rdm(X: torch.Tensor) -> torch.Tensor:
     """Compute Euclidean-distance RDM.
 
     Args:
-        X: Input tensor of shape `(n_stimuli, n_features)`.
+        X: Input tensor of shape `(n_samples, n_features)`.
 
     Returns:
-        Tensor of shape `(n_stimuli, n_stimuli)` with pairwise L2 distances.
+        Tensor of shape `(n_samples, n_samples)` with pairwise L2 distances.
     """
     return torch.cdist(X, X, p=2)
 
@@ -67,10 +67,10 @@ def _cityblock_rdm(X: torch.Tensor) -> torch.Tensor:
     """Compute Manhattan-distance RDM.
 
     Args:
-        X: Input tensor of shape `(n_stimuli, n_features)`.
+        X: Input tensor of shape `(n_samples, n_features)`.
 
     Returns:
-        Tensor of shape `(n_stimuli, n_stimuli)` with pairwise L1 distances.
+        Tensor of shape `(n_samples, n_samples)` with pairwise L1 distances.
     """
     return torch.cdist(X, X, p=1)
 
@@ -164,12 +164,12 @@ class RSA:
 
         Parameters
         ----------
-        X : Tensor, shape (n_stimuli, n_features)
-            One row per stimulus.
+        X : Tensor, shape (n_samples, n_features)
+            One row per sample.
 
         Returns
         -------
-        rdm : Tensor, shape (n_stimuli, n_stimuli)
+        rdm : Tensor, shape (n_samples, n_samples)
             Symmetric matrix with zero diagonal.
 
         Examples
@@ -221,8 +221,8 @@ class RSA:
 
         Parameters
         ----------
-        X, Y : Tensor, shape (n_stimuli, n_features_*)
-            Row-per-stimulus matrices.  Both must have the same number of rows;
+        X, Y : Tensor, shape (n_samples, n_features_*)
+            Row-per-sample matrices.  Both must have the same number of rows;
             feature dimensionalities may differ.
 
         Returns
@@ -234,7 +234,7 @@ class RSA:
         Raises
         ------
         ValueError
-            If X and Y have different number of stimuli.
+            If X and Y have different number of samples.
 
         Examples
         --------
@@ -252,7 +252,7 @@ class RSA:
         """
         if X.shape[0] != Y.shape[0]:
             raise ValueError(
-                f"X and Y must have the same number of stimuli (rows). "
+                f"X and Y must have the same number of samples (rows). "
                 f"Got X: {X.shape[0]}, Y: {Y.shape[0]}."
             )
 
