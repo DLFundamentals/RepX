@@ -164,7 +164,7 @@ class TestRSAMixedDims:
         assert r.shape == torch.Size([])  # scalar
 
     def test_mismatched_stimuli_raises(self):
-        with pytest.raises(ValueError, match="same number of stimuli"):
+        with pytest.raises(ValueError, match="same number of samples"):
             RSA().rsa(torch.randn(30, 64), torch.randn(40, 64))
 
 
