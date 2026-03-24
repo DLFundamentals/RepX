@@ -50,6 +50,22 @@ print(score.item())   # scalar in [0, 1]
 score_gpu = cka.cka(X.cuda(), Y.cuda())
 ```
 
+### Geometry (CDNV)
+
+```python
+import torch
+from letorch.geometry import compute_cdnv, compute_directional_cdnv
+
+X = torch.randn(100, 128)
+y = torch.randint(0, 10, (100,))
+
+cdnv_score = compute_cdnv(X, y, num_classes=10)
+dir_cdnv_score = compute_directional_cdnv(X, y, num_classes=10)
+
+print(cdnv_score)
+print(dir_cdnv_score)
+```
+
 ## RSA API
 
 ### `RSA(rdm_metric="correlation", compare="spearman")`
