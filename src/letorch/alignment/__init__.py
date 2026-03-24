@@ -5,7 +5,7 @@ This subpackage exposes:
 - CKA: Centered Kernel Alignment.
 """
 
-from .rsa import RSA
 from .cka import CKA
+from .rsa import RSA
 
 __all__ = ["RSA", "CKA"]

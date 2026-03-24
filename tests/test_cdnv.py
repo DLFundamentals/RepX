@@ -5,9 +5,7 @@ Run with: pytest tests/
 
 import pytest
 import torch
-
 from letorch.geometry import compute_cdnv, compute_directional_cdnv
-
 
 # ---------------------------------------------------------------------------
 # compute_cdnv

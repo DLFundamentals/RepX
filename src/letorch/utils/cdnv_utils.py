@@ -29,7 +29,9 @@ def _validate_features_and_labels(
         `(features, labels)` moved to `device`.
     """
     if features.ndim != 2:
-        raise ValueError("features must be a 2D tensor of shape (num_samples, feature_dim).")
+        raise ValueError(
+            "features must be a 2D tensor of shape (num_samples, feature_dim)."
+        )
     if labels.ndim != 1:
         raise ValueError("labels must be a 1D tensor of shape (num_samples,).")
     if features.shape[0] != labels.shape[0]:
@@ -94,7 +96,9 @@ def _compute_class_means(
         Mean feature vector for each class.
     """
     feature_dim = features.shape[1]
-    means = torch.zeros(num_classes, feature_dim, device=features.device, dtype=features.dtype)
+    means = torch.zeros(
+        num_classes, feature_dim, device=features.device, dtype=features.dtype
+    )
 
     for class_idx in range(num_classes):
         idxs = (labels == class_idx).nonzero(as_tuple=True)[0]

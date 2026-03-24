@@ -79,7 +79,9 @@ def compute_cdnv(
     second_moments = torch.zeros(
         resolved_num_classes, device=features.device, dtype=features.dtype
     )
-    class_present = torch.zeros(resolved_num_classes, device=features.device, dtype=torch.bool)
+    class_present = torch.zeros(
+        resolved_num_classes, device=features.device, dtype=torch.bool
+    )
 
     for class_idx in range(resolved_num_classes):
         idxs = (labels == class_idx).nonzero(as_tuple=True)[0]
@@ -174,7 +176,9 @@ def compute_directional_cdnv(
         means = means.to(features.device)
 
     if means.ndim != 2:
-        raise ValueError("means must be a 2D tensor of shape (num_classes, feature_dim).")
+        raise ValueError(
+            "means must be a 2D tensor of shape (num_classes, feature_dim)."
+        )
     if means.shape[0] < resolved_num_classes:
         raise ValueError(
             "means first dimension must be at least num_classes. "
