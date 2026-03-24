@@ -847,11 +847,11 @@ and <code>"cityblock"</code> (L1/Manhattan distance).</p>
                 <code>X</code>
             </td>
             <td>
-                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="n_stimuli">n_stimuli</span>, <span title="n_features">n_features</span>))</code>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="n_samples">n_samples</span>, <span title="n_features">n_features</span>))</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>One row per stimulus.</p>
+                <p>One row per sample.</p>
               </div>
             </td>
             <td>
@@ -873,7 +873,7 @@ and <code>"cityblock"</code> (L1/Manhattan distance).</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>rdm</code></td>            <td>
-                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="n_stimuli">n_stimuli</span>, <span title="n_stimuli">n_stimuli</span>))</code>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="n_samples">n_samples</span>, <span title="n_samples">n_samples</span>))</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1015,11 +1015,11 @@ triangles, and correlates them using the settings from <code>__init__</code>.</p
                 <code>X</code>
             </td>
             <td>
-                  <code>Tensor, shape (n_stimuli, n_features_*)</code>
+                  <code>Tensor, shape (n_samples, n_features_*)</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Row-per-stimulus matrices.  Both must have the same number of rows;
+                <p>Row-per-sample matrices.  Both must have the same number of rows;
 feature dimensionalities may differ.</p>
               </div>
             </td>
@@ -1032,11 +1032,11 @@ feature dimensionalities may differ.</p>
                 <code>Y</code>
             </td>
             <td>
-                  <code>Tensor, shape (n_stimuli, n_features_*)</code>
+                  <code>Tensor, shape (n_samples, n_features_*)</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Row-per-stimulus matrices.  Both must have the same number of rows;
+                <p>Row-per-sample matrices.  Both must have the same number of rows;
 feature dimensionalities may differ.</p>
               </div>
             </td>
@@ -1087,7 +1087,7 @@ Call <code>.item()</code> to get a Python float.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If X and Y have different number of stimuli.</p>
+                <p>If X and Y have different number of samples.</p>
               </div>
             </td>
           </tr>
@@ -1227,7 +1227,7 @@ the debiased HSIC estimator.</p>
                 <code>X</code>
             </td>
             <td>
-                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="n_stimuli">n_stimuli</span>, <span title="n_features">n_features</span>))</code>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="n_samples">n_samples</span>, <span title="n_features">n_features</span>))</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1253,7 +1253,7 @@ the debiased HSIC estimator.</p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>K</code></td>            <td>
-                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="n_stimuli">n_stimuli</span>, <span title="n_stimuli">n_stimuli</span>))</code>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="n_samples">n_samples</span>, <span title="n_samples">n_samples</span>))</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1313,11 +1313,11 @@ denominator in the unbiased HSIC estimator.</p>
                 <code>X</code>
             </td>
             <td>
-                  <code>Tensor, shape (n_stimuli, n_features_*)</code>
+                  <code>Tensor, shape (n_samples, n_features_*)</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Row-per-stimulus matrices.  Both must have the same number of
+                <p>Row-per-sample matrices.  Both must have the same number of
 rows; feature dimensionalities may differ.</p>
               </div>
             </td>
@@ -1330,11 +1330,11 @@ rows; feature dimensionalities may differ.</p>
                 <code>Y</code>
             </td>
             <td>
-                  <code>Tensor, shape (n_stimuli, n_features_*)</code>
+                  <code>Tensor, shape (n_samples, n_features_*)</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Row-per-stimulus matrices.  Both must have the same number of
+                <p>Row-per-sample matrices.  Both must have the same number of
 rows; feature dimensionalities may differ.</p>
               </div>
             </td>
@@ -1385,7 +1385,7 @@ for independent ones.  Call <code>.item()</code> for a Python float.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>If X and Y have different number of stimuli or n &lt; 4.</p>
+                <p>If X and Y have different number of samples or n &lt; 4.</p>
               </div>
             </td>
           </tr>
