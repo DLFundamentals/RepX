@@ -74,7 +74,7 @@ class CKA:
     Notes
     -----
     - Invariant to orthogonal transforms and isotropic scaling with linear kernel.
-    - Requires at least 4 samples (rows).
+    - Requires at least 4 stimuli (rows).
     """
 
     def __init__(self, kernel: Literal["linear"] = "linear") -> None:
@@ -90,7 +90,7 @@ class CKA:
         Parameters
         ----------
         X : Tensor, shape (n_samples, n_features)
-            One row per sample.
+            One row per stimulus.
 
         Returns
         -------
@@ -116,7 +116,7 @@ class CKA:
         Builds a kernel matrix for each representation, zeros the diagonals,
         and computes the normalised debiased HSIC.
 
-        Requires at least 4 samples (rows) due to the ``n*(n-3)``
+        Requires at least 4 stimuli (rows) due to the ``n*(n-3)``
         denominator in the unbiased HSIC estimator.
 
         Parameters

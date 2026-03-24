@@ -117,7 +117,7 @@ class TestCKAMixedDims:
         assert score.shape == torch.Size([])  # scalar
 
     def test_mismatched_stimuli_raises(self):
-        with pytest.raises(ValueError, match="same number of stimuli"):
+        with pytest.raises(ValueError, match="same number of samples"):
             CKA().cka(torch.randn(30, 64), torch.randn(40, 64))
 
 
@@ -132,7 +132,7 @@ class TestCKAErrors:
             CKA(kernel="rbf")
 
     def test_too_few_stimuli_raises(self):
-        with pytest.raises(ValueError, match="At least 4 stimuli"):
+        with pytest.raises(ValueError, match="At least 4 samples"):
             CKA().cka(torch.randn(3, 64), torch.randn(3, 64))
 
 
