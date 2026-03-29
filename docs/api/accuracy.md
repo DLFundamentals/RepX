@@ -4,7 +4,7 @@ Accuracy-based representation metrics.
 
 === "Overview"
 
-    ::: letorch.accuracy
+    ::: repx.accuracy
 
 === "Submodules"
 
@@ -12,4 +12,4 @@ Accuracy-based representation metrics.
 
 === "Files"
 
-    - `src/letorch/accuracy/__init__.py`
+    - `src/repx/accuracy/__init__.py`

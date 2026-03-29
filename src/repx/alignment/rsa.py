@@ -176,7 +176,7 @@ class RSA:
         --------
         ```python
         import torch
-        from letorch.alignment import RSA
+        from repx.alignment import RSA
 
         X = torch.randn(5, 3)
         rdm = RSA(rdm_metric="correlation").compute_rdm(X)
@@ -200,7 +200,7 @@ class RSA:
         --------
         ```python
         import torch
-        from letorch.alignment import RSA
+        from repx.alignment import RSA
 
         rdm = torch.tensor(
             [[0.0, 1.0, 2.0], [1.0, 0.0, 3.0], [2.0, 3.0, 0.0]]
@@ -240,7 +240,7 @@ class RSA:
         --------
         ```python
         import torch
-        from letorch.alignment import RSA
+        from repx.alignment import RSA
 
         rsa = RSA(rdm_metric="correlation", compare="spearman")
         X = torch.randn(20, 64)

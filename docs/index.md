@@ -12,7 +12,7 @@ LeTorch currently provides:
 
 ```python
 import torch
-from letorch import RSA, CKA
+from repx import RSA, CKA
 
 X = torch.randn(50, 512)
 Y = torch.randn(50, 768)
@@ -28,7 +28,7 @@ print(cka.cka(X, Y).item())
 
 ```python
 import torch
-from letorch.geometry import compute_cdnv, compute_directional_cdnv
+from repx.geometry import compute_cdnv, compute_directional_cdnv
 
 X = torch.randn(100, 128)
 y = torch.randint(0, 10, (100,))

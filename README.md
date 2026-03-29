@@ -5,7 +5,7 @@ PyTorch-native metrics for representation analysis.
 ## Installation
 
 ```bash
-pip install letorch
+pip install repx
 ```
 
 ## Quick Start
@@ -14,7 +14,7 @@ pip install letorch
 
 ```python
 import torch
-from letorch import RSA
+from repx import RSA
 
 # Two representation matrices — rows = stimuli, columns = features
 X = torch.randn(50, 512)   # e.g. embeddings from model A
@@ -34,7 +34,7 @@ r_gpu = rsa.rsa(X.cuda(), Y.cuda())
 
 ```python
 import torch
-from letorch import CKA
+from repx import CKA
 
 X = torch.randn(50, 512)
 Y = torch.randn(50, 768)
@@ -52,7 +52,7 @@ score_gpu = cka.cka(X.cuda(), Y.cuda())
 
 ```python
 import torch
-from letorch.geometry import compute_cdnv, compute_directional_cdnv
+from repx.geometry import compute_cdnv, compute_directional_cdnv
 
 X = torch.randn(100, 128)
 y = torch.randint(0, 10, (100,))

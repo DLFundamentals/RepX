@@ -1,4 +1,4 @@
-# Contributing to letorch
+# Contributing to repx
 
 Thanks for your interest in contributing! This project aims to provide clean, reliable tools for evaluating learned representations in PyTorch.
 
@@ -11,15 +11,15 @@ This guide will help you get started quickly and avoid common pitfalls.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/nishit/letorch.git
-cd letorch
+git clone https://github.com/nishit/repx.git
+cd repx
 ```
 
 ### 2. Set up a virtual environment
 
 ```bash
-conda create -n letorch-dev python=3.10
-conda activate letorch-dev
+conda create -n repx-dev python=3.10
+conda activate repx-dev
 pip install -e ".[dev]"
 ```
 
@@ -42,7 +42,7 @@ pytest tests/
 1. Create a new file `cka.py` in the appropriate submodule (e.g., `alignment/`).
 
 ```bash
-src/letorch/alignment/cka.py
+src/repx/alignment/cka.py
 ```
 
 2. Implement the metric as a function:
@@ -59,7 +59,7 @@ def cka(X: torch.Tensor, Y: torch.Tensor) -> float:
 tests/test_alignment/test_cka.py
 ```
 
-4. Export it in `src/letorch/__init__.py`:
+4. Export it in `src/repx/__init__.py`:
 
 ```python
 from .alignment.cka import cka
@@ -74,7 +74,7 @@ from .alignment.cka import cka
 ## Project structure
 
 ```
-src/letorch/
+src/repx/
 ├── alignment/
 ├── geometry/
 ├── accuracy/

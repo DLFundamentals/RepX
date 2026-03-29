@@ -6,7 +6,7 @@ from typing import Optional, Union
 
 import torch
 
-from letorch.utils.cdnv_utils import (
+from repx.utils.cdnv_utils import (
     _compute_class_means,
     _resolve_num_classes,
     _validate_features_and_labels,
@@ -55,7 +55,7 @@ def compute_directional_cdnv(
     --------
     ```python
     import torch
-    from letorch.geometry import compute_directional_cdnv
+    from repx.geometry import compute_directional_cdnv
 
     x = torch.randn(100, 128)
     y = torch.randint(0, 10, (100,))

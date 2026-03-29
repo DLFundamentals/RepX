@@ -1,6 +1,6 @@
 site_name: LeTorch
 site_description: PyTorch-native tools for neural representation analysis
-site_url: https://github.com/nishit/letorch
+site_url: https://github.com/nishit/repx
 
 theme:
   name: material

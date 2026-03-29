@@ -1,11 +1,11 @@
-"""Tests for letorch.rsa
+"""Tests for repx.rsa
 
 Run with:  pytest tests/
 """
 
 import pytest
 import torch
-from letorch.alignment.rsa import RSA
+from repx.alignment.rsa import RSA
 
 # ---------------------------------------------------------------------------
 # Helpers

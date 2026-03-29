@@ -101,7 +101,7 @@ class CKA:
         --------
         ```python
         import torch
-        from letorch.alignment import CKA
+        from repx.alignment import CKA
 
         X = torch.randn(4, 3)
         K = CKA().compute_kernel(X)
@@ -140,7 +140,7 @@ class CKA:
         --------
         ```python
         import torch
-        from letorch.alignment import CKA
+        from repx.alignment import CKA
 
         cka = CKA(kernel="linear")
         X = torch.randn(20, 64)

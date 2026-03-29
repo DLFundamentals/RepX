@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "letorch"
+name = "repx"
 version = "0.1.1"
 description = "PyTorch-native tools for evaluating learned representations"
 readme = "README.md"
@@ -61,7 +61,7 @@ Issues   = "https://github.com/DLFundamentals/LeTorch/issues"
 # Hatch config
 # -------------------------
 [tool.hatch.build.targets.wheel]
-packages = ["src/letorch"]
+packages = ["src/repx"]
 
 # -------------------------
 # Ruff (lint + format)
@@ -83,6 +83,7 @@ indent-style = "space"
 # -------------------------
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["src"]
 
 # -------------------------
 # Mypy (optional but useful)

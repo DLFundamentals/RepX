@@ -4,7 +4,7 @@ Shared utilities and base classes.
 
 === "Overview"
 
-    ::: letorch.core
+    ::: repx.core
 
 === "Submodules"
 
@@ -12,4 +12,4 @@ Shared utilities and base classes.
 
 === "Files"
 
-    - `src/letorch/core/__init__.py`
+    - `src/repx/core/__init__.py`

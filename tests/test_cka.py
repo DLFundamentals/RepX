@@ -1,11 +1,11 @@
-"""Tests for letorch.cka
+"""Tests for repx.cka
 
 Run with:  pytest tests/
 """
 
 import pytest
 import torch
-from letorch.alignment.cka import CKA
+from repx.alignment.cka import CKA
 
 # ---------------------------------------------------------------------------
 # compute_kernel

@@ -1,4 +1,4 @@
-"""letorch.accuracy — Accuracy-based representation metrics.
+"""repx.accuracy — Accuracy-based representation metrics.
 
 This subpackage provides methods for measuring representation quality using
 accuracy-based metrics. These metrics evaluate how well a representation

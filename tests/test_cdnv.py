@@ -1,11 +1,11 @@
-"""Tests for letorch.geometry.cdnv.
+"""Tests for repx.collapse.cdnv.
 
 Run with: pytest tests/
 """
 
 import pytest
 import torch
-from letorch.geometry import compute_cdnv, compute_directional_cdnv
+from repx.collapse import compute_cdnv, compute_directional_cdnv
 
 # ---------------------------------------------------------------------------
 # compute_cdnv
