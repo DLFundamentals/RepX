@@ -102,7 +102,7 @@ def compute_cdnv(
             variance2 = torch.abs(second_moments[class2] - means[class2].pow(2).sum())
             variance_avg = (variance1 + variance2) / 2.0
 
-            dist_sq = torch.norm(means[class1] - means[class2]).pow(2)
+            dist_sq = torch.linalg.vector_norm(means[class1] - means[class2]).pow(2)
             if dist_sq <= eps:
                 continue
 

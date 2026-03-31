@@ -103,7 +103,7 @@ def compute_directional_cdnv(
                 continue
 
             v = means[class2] - means[class1]
-            v_norm = v.norm()
+            v_norm = torch.linalg.vector_norm(v)
             if v_norm <= eps:
                 continue
 
