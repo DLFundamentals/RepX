@@ -5,6 +5,7 @@ Run with: pytest tests/
 
 import pytest
 import torch
+
 from repx.collapse import compute_cdnv, compute_directional_cdnv
 
 # ---------------------------------------------------------------------------

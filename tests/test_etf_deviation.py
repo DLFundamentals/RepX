@@ -7,6 +7,7 @@ import math
 
 import pytest
 import torch
+
 from repx.collapse import compute_etf_deviation
 
 

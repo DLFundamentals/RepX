@@ -110,7 +110,9 @@ def compute_nccc_centers(
         sampled_features_t = torch.cat(sampled_features, dim=0)
         sampled_labels_t = torch.cat(sampled_labels, dim=0)
 
-        means_all = _compute_class_means(sampled_features_t, sampled_labels_t, max_class + 1)
+        means_all = _compute_class_means(
+            sampled_features_t, sampled_labels_t, max_class + 1
+        )
         centers_per_repeat.append(means_all[selected])
 
     return centers_per_repeat, selected

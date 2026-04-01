@@ -85,7 +85,9 @@ class LinearProbeEvaluator:
             )
 
         if selected_classes is None:
-            resolved_classes = sorted(int(c) for c in torch.unique(self.train_labels).tolist())
+            resolved_classes = sorted(
+                int(c) for c in torch.unique(self.train_labels).tolist()
+            )
         else:
             resolved_classes = [int(c) for c in selected_classes]
             if len(resolved_classes) == 0:
@@ -154,7 +156,9 @@ class LinearProbeEvaluator:
             perm = torch.randperm(len(idxs), device=features.device)[:n_samples]
             chosen_indices.extend(idxs[i] for i in perm.tolist())
 
-        index_tensor = torch.tensor(chosen_indices, device=features.device, dtype=torch.long)
+        index_tensor = torch.tensor(
+            chosen_indices, device=features.device, dtype=torch.long
+        )
         return features[index_tensor], labels[index_tensor]
 
     def _train_probe(
@@ -238,7 +242,9 @@ class LinearProbeEvaluator:
                     n_samples=n_samples,
                 )
 
-            probe = self._train_probe(fewshot_features, fewshot_labels, input_dim=input_dim)
+            probe = self._train_probe(
+                fewshot_features, fewshot_labels, input_dim=input_dim
+            )
             train_accs.append(self._evaluate_probe(probe, train_features, train_labels))
             test_accs.append(self._evaluate_probe(probe, test_features, test_labels))
 
