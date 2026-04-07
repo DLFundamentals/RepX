@@ -5,7 +5,6 @@ Run with:  pytest tests/
 
 import pytest
 import torch
-
 from repx.alignment.rsa import RSA
 
 # ---------------------------------------------------------------------------

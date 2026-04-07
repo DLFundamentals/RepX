@@ -4,7 +4,6 @@ Run with: pytest tests/
 """
 
 import torch
-
 from repx.transfer import NCCCEvaluator
 
 

@@ -12,7 +12,10 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 import torch
 
 from repx.utils.label_utils import _filter_features_and_map_labels
-from repx.utils.mean_utils import _resolve_selected_classes, _validate_features_and_labels
+from repx.utils.mean_utils import (
+    _resolve_selected_classes,
+    _validate_features_and_labels,
+)
 
 __all__ = ["LinearProbeEvaluator"]
 

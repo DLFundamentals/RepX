@@ -2,7 +2,6 @@
 
 import pytest
 import torch
-
 from repx.transfer import LinearProbeEvaluator
 
 

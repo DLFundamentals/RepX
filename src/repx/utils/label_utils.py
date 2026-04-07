@@ -34,7 +34,9 @@ def _map_labels_to_indices(
     mask = torch.isin(labels, selected_tensor)
     labels_sub = labels[mask]
 
-    mapped_labels = torch.empty(labels_sub.shape[0], device=labels.device, dtype=torch.long)
+    mapped_labels = torch.empty(
+        labels_sub.shape[0], device=labels.device, dtype=torch.long
+    )
     for mapped_idx, class_id in enumerate(selected):
         mapped_labels[labels_sub == class_id] = mapped_idx
 
