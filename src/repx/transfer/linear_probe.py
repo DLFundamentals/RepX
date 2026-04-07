@@ -11,7 +11,8 @@ from typing import Dict, List, Optional, Sequence, Tuple, Union
 
 import torch
 
-from repx.utils.cdnv_utils import _validate_features_and_labels
+from repx.utils.label_utils import _map_labels_to_indices
+from repx.utils.mean_utils import _resolve_selected_classes, _validate_features_and_labels
 
 __all__ = ["LinearProbeEvaluator"]
 
@@ -84,14 +85,10 @@ class LinearProbeEvaluator:
                 f"Got {self.train_features.shape[1]} and {self.test_features.shape[1]}."
             )
 
-        if selected_classes is None:
-            resolved_classes = sorted(
-                int(c) for c in torch.unique(self.train_labels).tolist()
-            )
-        else:
-            resolved_classes = [int(c) for c in selected_classes]
-            if len(resolved_classes) == 0:
-                raise ValueError("selected_classes must contain at least one class.")
+        resolved_classes = _resolve_selected_classes(
+            self.train_labels,
+            selected_classes,
+        )
 
         if self.num_output_classes < len(resolved_classes):
             raise ValueError(
@@ -112,21 +109,11 @@ class LinearProbeEvaluator:
         labels: torch.Tensor,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         """Filter to selected classes and map labels to 0..k-1."""
-        selected = torch.tensor(
-            self.selected_classes,
-            device=labels.device,
-            dtype=labels.dtype,
-        )
-        mask = torch.isin(labels, selected)
+        mapped, mask = _map_labels_to_indices(labels, self.selected_classes)
         filtered_features = features[mask]
-        filtered_labels = labels[mask]
 
-        if filtered_labels.numel() == 0:
+        if mapped.numel() == 0:
             raise ValueError("No samples match selected_classes.")
-
-        mapped = torch.empty_like(filtered_labels, dtype=torch.long)
-        for original, mapped_id in self.label_map.items():
-            mapped[filtered_labels == original] = mapped_id
 
         return filtered_features, mapped
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 import torch
 
@@ -70,6 +70,20 @@ def _resolve_num_classes(labels: torch.Tensor, num_classes: Optional[int]) -> in
     if inferred <= 0:
         raise ValueError("Could not infer a valid number of classes from labels.")
     return inferred
+
+
+def _resolve_selected_classes(
+    labels: torch.Tensor,
+    selected_classes: Optional[Sequence[int]],
+) -> List[int]:
+    """Resolve selected classes from explicit ids or infer from labels."""
+    if selected_classes is None:
+        return sorted(int(c) for c in torch.unique(labels).tolist())
+
+    resolved = [int(c) for c in selected_classes]
+    if len(resolved) == 0:
+        raise ValueError("selected_classes must contain at least one class.")
+    return resolved
 
 
 def _compute_class_means(
