@@ -73,12 +73,11 @@ class TestLinearProbeEvaluator:
             test_features=test_x,
             test_labels=test_y,
             num_output_classes=2,
-            selected_classes=[0, 2],
             device="cpu",
             epochs=2,
         )
 
-        train_acc, test_acc = evaluator.evaluate(repeat=2)
+        train_acc, test_acc = evaluator.evaluate(repeat=2, selected_classes=[0, 2])
         assert 0.0 <= train_acc <= 1.0
         assert 0.0 <= test_acc <= 1.0
 
@@ -104,13 +103,13 @@ class TestLinearProbeEvaluator:
     def test_invalid_output_classes_raises(self):
         train_x, train_y, test_x, test_y = _make_separable_dataset(n_per_class=8)
 
+        evaluator = LinearProbeEvaluator(
+            train_features=train_x,
+            train_labels=train_y,
+            test_features=test_x,
+            test_labels=test_y,
+            num_output_classes=1,
+            device="cpu",
+        )
         with pytest.raises(ValueError, match="num_output_classes"):
-            LinearProbeEvaluator(
-                train_features=train_x,
-                train_labels=train_y,
-                test_features=test_x,
-                test_labels=test_y,
-                num_output_classes=1,
-                selected_classes=[0, 1],
-                device="cpu",
-            )
+            evaluator.evaluate(selected_classes=[0, 1])

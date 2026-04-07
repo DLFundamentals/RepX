@@ -39,3 +39,24 @@ def _map_labels_to_indices(
         mapped_labels[labels_sub == class_id] = mapped_idx
 
     return mapped_labels, mask
+
+
+def _filter_features_and_map_labels(
+    features: torch.Tensor,
+    labels: torch.Tensor,
+    selected_classes: Sequence[int],
+) -> Tuple[torch.Tensor, torch.Tensor]:
+    """Filter features to selected classes and return mapped labels.
+
+    Returns
+    -------
+    tuple[Tensor, Tensor]
+        ``(filtered_features, mapped_labels)`` for selected classes only.
+    """
+    mapped_labels, mask = _map_labels_to_indices(labels, selected_classes)
+    filtered_features = features[mask]
+
+    if mapped_labels.numel() == 0:
+        raise ValueError("No samples match selected_classes.")
+
+    return filtered_features, mapped_labels
