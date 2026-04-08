@@ -83,6 +83,26 @@ class TestLinearProbeEvaluator:
         assert 0.0 <= train_acc <= 1.0
         assert 0.0 <= test_acc <= 1.0
 
+    def test_custom_optimizer_and_loss_kwargs(self):
+        train_x, train_y, test_x, test_y = _make_separable_dataset()
+        evaluator = LinearProbeEvaluator(device="cpu")
+
+        train_acc, test_acc = evaluator.evaluate(
+            train_features=train_x,
+            train_labels=train_y,
+            test_features=test_x,
+            test_labels=test_y,
+            num_output_classes=2,
+            epochs=200,
+            repeat=2,
+            optimizer="sgd",
+            optimizer_kwargs={"lr": 0.1, "momentum": 0.9},
+            loss_fn="cross_entropy",
+            loss_fn_kwargs={"label_smoothing": 0.01},
+        )
+        assert 0.0 <= train_acc <= 1.0
+        assert 0.0 <= test_acc <= 1.0
+
     def test_few_shot_raises_when_class_too_small(self):
         train_x = torch.randn(6, 4)
         train_y = torch.tensor([0, 0, 1, 1, 1, 1], dtype=torch.long)

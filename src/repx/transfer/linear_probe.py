@@ -6,7 +6,7 @@ classification quality of frozen embeddings.
 
 from __future__ import annotations
 
-from typing import List, Optional, Sequence, Tuple, Union
+from typing import Any, List, Mapping, Optional, Sequence, Tuple, Type, Union
 
 import torch
 
@@ -15,6 +15,7 @@ from repx.utils.helpers import (
     _validate_features_and_labels,
 )
 from repx.utils.label_utils import _filter_features_and_map_labels, _sample_per_class
+from repx.utils.torch_utils import _resolve_loss, _resolve_optimizer
 
 __all__ = ["LinearProbeEvaluator"]
 
@@ -40,15 +41,18 @@ class LinearProbeEvaluator:
         labels: torch.Tensor,
         input_dim: int,
         num_output_classes: int,
-        lr: float,
+        optimizer_cls: Type[torch.optim.Optimizer],
+        optimizer_kwargs: Mapping[str, Any],
+        loss_cls: Type[torch.nn.Module],
+        loss_kwargs: Mapping[str, Any],
         epochs: int,
     ) -> torch.nn.Module:
         """Train a linear layer with cross-entropy loss."""
         probe = torch.nn.Linear(input_dim, num_output_classes, bias=False).to(
             self.device
         )
-        optimizer = torch.optim.Adam(probe.parameters(), lr=lr)
-        loss_fn = torch.nn.CrossEntropyLoss()
+        optimizer = optimizer_cls(probe.parameters(), **dict(optimizer_kwargs))
+        loss_fn = loss_cls(**dict(loss_kwargs))
 
         for _ in range(epochs):
             probe.train()
@@ -85,6 +89,10 @@ class LinearProbeEvaluator:
         n_shots: Optional[int] = None,
         repeat: int = 5,
         selected_classes: Optional[Sequence[int]] = None,
+        optimizer: Union[str, Type[torch.optim.Optimizer]] = "adam",
+        optimizer_kwargs: Optional[Mapping[str, Any]] = None,
+        loss_fn: Union[str, Type[torch.nn.Module]] = "cross_entropy",
+        loss_fn_kwargs: Optional[Mapping[str, Any]] = None,
     ) -> Tuple[float, float]:
         """Train and evaluate a linear probe.
 
@@ -111,6 +119,15 @@ class LinearProbeEvaluator:
             Number of repeated runs.
         selected_classes : sequence[int], optional
             If provided, restrict training/evaluation to this class subset.
+        optimizer : str or Optimizer class, default="adam"
+            Optimizer choice used to train the probe.
+        optimizer_kwargs : mapping, optional
+            Extra keyword arguments passed to optimizer constructor.
+            If ``lr`` is not provided, this method's ``lr`` argument is used.
+        loss_fn : str or nn.Module class, default="cross_entropy"
+            Loss function used for probe training.
+        loss_fn_kwargs : mapping, optional
+            Extra keyword arguments passed to the loss constructor.
 
         Returns
         -------
@@ -127,6 +144,12 @@ class LinearProbeEvaluator:
             raise ValueError(f"lr must be positive. Got {lr}.")
         if repeat <= 0:
             raise ValueError(f"repeat must be positive. Got {repeat}.")
+
+        optimizer_cls = _resolve_optimizer(optimizer)
+        loss_cls = _resolve_loss(loss_fn)
+        optimizer_kwargs_resolved = dict(optimizer_kwargs or {})
+        loss_kwargs_resolved = dict(loss_fn_kwargs or {})
+        optimizer_kwargs_resolved.setdefault("lr", lr)
 
         train_features, train_labels = _validate_features_and_labels(
             train_features,
@@ -188,7 +211,10 @@ class LinearProbeEvaluator:
                 selected_labels,
                 input_dim=input_dim,
                 num_output_classes=num_output_classes,
-                lr=lr,
+                optimizer_cls=optimizer_cls,
+                optimizer_kwargs=optimizer_kwargs_resolved,
+                loss_cls=loss_cls,
+                loss_kwargs=loss_kwargs_resolved,
                 epochs=epochs,
             )
             train_accs.append(self._evaluate_probe(probe, train_features, train_labels))
