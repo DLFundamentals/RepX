@@ -11,12 +11,12 @@ from typing import List, Optional, Sequence, Tuple, Union
 
 import torch
 
-from repx.utils.label_utils import _map_labels_to_indices, _sample_per_class
 from repx.utils.helpers import (
     _compute_class_means,
     _resolve_selected_classes,
     _validate_features_and_labels,
 )
+from repx.utils.label_utils import _map_labels_to_indices, _sample_per_class
 
 __all__ = ["NCCCEvaluator"]
 
@@ -60,7 +60,7 @@ class NCCCEvaluator:
             sampled_features_t, sampled_labels_t = _sample_per_class(
                 features_sub,
                 mapped_labels,
-                n_shotss=n_shots,
+                n_shots=n_shots,
                 num_classes=len(selected),
                 strict=False,
                 seed=repeat_idx,

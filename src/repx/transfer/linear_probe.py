@@ -10,11 +10,11 @@ from typing import List, Optional, Sequence, Tuple, Union
 
 import torch
 
-from repx.utils.label_utils import _filter_features_and_map_labels, _sample_per_class
 from repx.utils.helpers import (
     _resolve_selected_classes,
     _validate_features_and_labels,
 )
+from repx.utils.label_utils import _filter_features_and_map_labels, _sample_per_class
 
 __all__ = ["LinearProbeEvaluator"]
 
@@ -44,7 +44,9 @@ class LinearProbeEvaluator:
         epochs: int,
     ) -> torch.nn.Module:
         """Train a linear layer with cross-entropy loss."""
-        probe = torch.nn.Linear(input_dim, num_output_classes, bias=False).to(self.device)
+        probe = torch.nn.Linear(input_dim, num_output_classes, bias=False).to(
+            self.device
+        )
         optimizer = torch.optim.Adam(probe.parameters(), lr=lr)
         loss_fn = torch.nn.CrossEntropyLoss()
 
