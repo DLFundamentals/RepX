@@ -60,7 +60,7 @@ class TestNCCC:
         features = torch.randn(30, 8)
         labels = torch.tensor([0] * 10 + [1] * 10 + [2] * 10, dtype=torch.long)
 
-        accs = evaluator.evaluate(features, labels, n_shot=3, repeat=5)
+        accs = evaluator.evaluate(features, labels, n_shots=3, repeat=5)
         assert len(accs) == 5
         for acc in accs:
             assert 0.0 <= acc <= 1.0

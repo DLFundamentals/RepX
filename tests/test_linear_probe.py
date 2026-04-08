@@ -36,7 +36,7 @@ class TestLinearProbeEvaluator:
             num_output_classes=2,
             lr=5e-2,
             epochs=200,
-            n_samples=None,
+            n_shots=None,
             repeat=3,
         )
         assert 0.95 <= train_acc <= 1.0
@@ -54,7 +54,7 @@ class TestLinearProbeEvaluator:
             num_output_classes=2,
             lr=1e-2,
             epochs=150,
-            n_samples=4,
+            n_shots=4,
             repeat=5,
         )
         assert 0.0 <= train_acc <= 1.0
@@ -99,7 +99,7 @@ class TestLinearProbeEvaluator:
                 test_labels=test_y,
                 num_output_classes=2,
                 epochs=2,
-                n_samples=3,
+                n_shots=3,
                 repeat=1,
             )
 
