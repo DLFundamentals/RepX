@@ -26,35 +26,37 @@ def _make_separable_dataset(n_per_class: int = 32):
 class TestLinearProbeEvaluator:
     def test_full_shot_high_accuracy(self):
         train_x, train_y, test_x, test_y = _make_separable_dataset()
-        evaluator = LinearProbeEvaluator(
+        evaluator = LinearProbeEvaluator(device="cpu")
+
+        train_acc, test_acc = evaluator.evaluate(
             train_features=train_x,
             train_labels=train_y,
             test_features=test_x,
             test_labels=test_y,
             num_output_classes=2,
-            device="cpu",
             lr=5e-2,
             epochs=200,
+            n_samples=None,
+            repeat=3,
         )
-
-        train_acc, test_acc = evaluator.evaluate(n_samples=None, repeat=3)
         assert 0.95 <= train_acc <= 1.0
         assert 0.95 <= test_acc <= 1.0
 
     def test_few_shot_runs_and_returns_valid_range(self):
         train_x, train_y, test_x, test_y = _make_separable_dataset()
-        evaluator = LinearProbeEvaluator(
+        evaluator = LinearProbeEvaluator(device="cpu")
+
+        train_acc, test_acc = evaluator.evaluate(
             train_features=train_x,
             train_labels=train_y,
             test_features=test_x,
             test_labels=test_y,
             num_output_classes=2,
-            device="cpu",
             lr=1e-2,
             epochs=150,
+            n_samples=4,
+            repeat=5,
         )
-
-        train_acc, test_acc = evaluator.evaluate(n_samples=4, repeat=5)
         assert 0.0 <= train_acc <= 1.0
         assert 0.0 <= test_acc <= 1.0
         assert test_acc > 0.8
@@ -66,17 +68,18 @@ class TestLinearProbeEvaluator:
         test_x = torch.randn(60, 8)
         test_y = torch.tensor([0] * 20 + [1] * 20 + [2] * 20, dtype=torch.long)
 
-        evaluator = LinearProbeEvaluator(
+        evaluator = LinearProbeEvaluator(device="cpu")
+
+        train_acc, test_acc = evaluator.evaluate(
             train_features=train_x,
             train_labels=train_y,
             test_features=test_x,
             test_labels=test_y,
             num_output_classes=2,
-            device="cpu",
             epochs=2,
+            repeat=2,
+            selected_classes=[0, 2],
         )
-
-        train_acc, test_acc = evaluator.evaluate(repeat=2, selected_classes=[0, 2])
         assert 0.0 <= train_acc <= 1.0
         assert 0.0 <= test_acc <= 1.0
 
@@ -86,29 +89,30 @@ class TestLinearProbeEvaluator:
         test_x = torch.randn(4, 4)
         test_y = torch.tensor([0, 0, 1, 1], dtype=torch.long)
 
-        evaluator = LinearProbeEvaluator(
-            train_features=train_x,
-            train_labels=train_y,
-            test_features=test_x,
-            test_labels=test_y,
-            num_output_classes=2,
-            device="cpu",
-            epochs=2,
-        )
+        evaluator = LinearProbeEvaluator(device="cpu")
 
         with pytest.raises(ValueError, match="has only"):
-            evaluator.evaluate(n_samples=3, repeat=1)
+            evaluator.evaluate(
+                train_features=train_x,
+                train_labels=train_y,
+                test_features=test_x,
+                test_labels=test_y,
+                num_output_classes=2,
+                epochs=2,
+                n_samples=3,
+                repeat=1,
+            )
 
     def test_invalid_output_classes_raises(self):
         train_x, train_y, test_x, test_y = _make_separable_dataset(n_per_class=8)
 
-        evaluator = LinearProbeEvaluator(
-            train_features=train_x,
-            train_labels=train_y,
-            test_features=test_x,
-            test_labels=test_y,
-            num_output_classes=1,
-            device="cpu",
-        )
+        evaluator = LinearProbeEvaluator(device="cpu")
         with pytest.raises(ValueError, match="num_output_classes"):
-            evaluator.evaluate(selected_classes=[0, 1])
+            evaluator.evaluate(
+                train_features=train_x,
+                train_labels=train_y,
+                test_features=test_x,
+                test_labels=test_y,
+                num_output_classes=1,
+                selected_classes=[0, 1],
+            )

@@ -6,13 +6,12 @@ classification quality of frozen embeddings.
 
 from __future__ import annotations
 
-from collections import defaultdict
-from typing import Dict, List, Optional, Sequence, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 import torch
 
-from repx.utils.label_utils import _filter_features_and_map_labels
-from repx.utils.mean_utils import (
+from repx.utils.label_utils import _filter_features_and_map_labels, _sample_per_class
+from repx.utils.helpers import (
     _resolve_selected_classes,
     _validate_features_and_labels,
 )
@@ -25,116 +24,34 @@ class LinearProbeEvaluator:
 
     Parameters
     ----------
-    train_features : Tensor, shape (num_train, feature_dim)
-        Frozen train embeddings.
-    train_labels : Tensor, shape (num_train,)
-        Train labels.
-    test_features : Tensor, shape (num_test, feature_dim)
-        Frozen test embeddings.
-    test_labels : Tensor, shape (num_test,)
-        Test labels.
-    num_output_classes : int
-        Number of output classes for the linear probe layer.
     device : str or torch.device, default="cpu"
         Device used for training and evaluation.
-    lr : float, default=3e-4
-        Learning rate for Adam.
-    epochs : int, default=100
-        Number of optimization epochs.
     """
 
     def __init__(
         self,
-        train_features: torch.Tensor,
-        train_labels: torch.Tensor,
-        test_features: torch.Tensor,
-        test_labels: torch.Tensor,
-        num_output_classes: int,
         device: Union[str, torch.device] = "cpu",
-        lr: float = 3e-4,
-        epochs: int = 100,
     ) -> None:
-        if num_output_classes <= 0:
-            raise ValueError(
-                f"num_output_classes must be positive. Got {num_output_classes}."
-            )
-        if epochs <= 0:
-            raise ValueError(f"epochs must be positive. Got {epochs}.")
-        if lr <= 0:
-            raise ValueError(f"lr must be positive. Got {lr}.")
-
         self.device = torch.device(device)
-        self.lr = float(lr)
-        self.epochs = int(epochs)
-        self.num_output_classes = int(num_output_classes)
-
-        self.train_features, self.train_labels = _validate_features_and_labels(
-            train_features,
-            train_labels,
-            device=self.device,
-        )
-        self.test_features, self.test_labels = _validate_features_and_labels(
-            test_features,
-            test_labels,
-            device=self.device,
-        )
-
-        if self.train_features.shape[1] != self.test_features.shape[1]:
-            raise ValueError(
-                "Feature dimension mismatch between train and test features. "
-                f"Got {self.train_features.shape[1]} and {self.test_features.shape[1]}."
-            )
-
-        self.loss_fn = torch.nn.CrossEntropyLoss()
-
-    def _sample_fewshot(
-        self,
-        features: torch.Tensor,
-        labels: torch.Tensor,
-        n_samples: int,
-        num_classes: int,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Sample ``n_samples`` examples per mapped class from the train set."""
-        if n_samples <= 0:
-            raise ValueError(f"n_samples must be positive. Got {n_samples}.")
-
-        class_to_indices: Dict[int, List[int]] = defaultdict(list)
-        for idx, label in enumerate(labels.tolist()):
-            class_to_indices[int(label)].append(idx)
-
-        chosen_indices: List[int] = []
-        for class_id in range(num_classes):
-            idxs = class_to_indices.get(class_id, [])
-            if len(idxs) < n_samples:
-                raise ValueError(
-                    f"Class {class_id} has only {len(idxs)} samples, "
-                    f"but n_samples={n_samples} was requested."
-                )
-
-            perm = torch.randperm(len(idxs), device=features.device)[:n_samples]
-            chosen_indices.extend(idxs[i] for i in perm.tolist())
-
-        index_tensor = torch.tensor(
-            chosen_indices, device=features.device, dtype=torch.long
-        )
-        return features[index_tensor], labels[index_tensor]
 
     def _train_probe(
         self,
         features: torch.Tensor,
         labels: torch.Tensor,
         input_dim: int,
+        num_output_classes: int,
+        lr: float,
+        epochs: int,
     ) -> torch.nn.Module:
         """Train a linear layer with cross-entropy loss."""
-        probe = torch.nn.Linear(input_dim, self.num_output_classes, bias=False).to(
-            self.device
-        )
-        optimizer = torch.optim.Adam(probe.parameters(), lr=self.lr)
+        probe = torch.nn.Linear(input_dim, num_output_classes, bias=False).to(self.device)
+        optimizer = torch.optim.Adam(probe.parameters(), lr=lr)
+        loss_fn = torch.nn.CrossEntropyLoss()
 
-        for _ in range(self.epochs):
+        for _ in range(epochs):
             probe.train()
             logits = probe(features)
-            loss = self.loss_fn(logits, labels)
+            loss = loss_fn(logits, labels)
 
             optimizer.zero_grad()
             loss.backward()
@@ -156,7 +73,14 @@ class LinearProbeEvaluator:
 
     def evaluate(
         self,
-        n_samples: Optional[int] = None,
+        train_features: torch.Tensor,
+        train_labels: torch.Tensor,
+        test_features: torch.Tensor,
+        test_labels: torch.Tensor,
+        num_output_classes: int,
+        lr: float = 3e-4,
+        epochs: int = 100,
+        n_shots: Optional[int] = None,
         repeat: int = 5,
         selected_classes: Optional[Sequence[int]] = None,
     ) -> Tuple[float, float]:
@@ -164,7 +88,21 @@ class LinearProbeEvaluator:
 
         Parameters
         ----------
-        n_samples : int, optional
+        train_features : Tensor, shape (num_train, feature_dim)
+            Frozen train embeddings.
+        train_labels : Tensor, shape (num_train,)
+            Train labels.
+        test_features : Tensor, shape (num_test, feature_dim)
+            Frozen test embeddings.
+        test_labels : Tensor, shape (num_test,)
+            Test labels.
+        num_output_classes : int
+            Number of output classes for the linear probe layer.
+        lr : float, default=3e-4
+            Learning rate for Adam.
+        epochs : int, default=100
+            Number of optimization epochs.
+        n_shots : int, optional
             Number of samples per class for few-shot training. If omitted,
             full filtered train data is used.
         repeat : int, default=5
@@ -177,27 +115,52 @@ class LinearProbeEvaluator:
         tuple[float, float]
             ``(mean_train_accuracy, mean_test_accuracy)``.
         """
+        if num_output_classes <= 0:
+            raise ValueError(
+                f"num_output_classes must be positive. Got {num_output_classes}."
+            )
+        if epochs <= 0:
+            raise ValueError(f"epochs must be positive. Got {epochs}.")
+        if lr <= 0:
+            raise ValueError(f"lr must be positive. Got {lr}.")
         if repeat <= 0:
             raise ValueError(f"repeat must be positive. Got {repeat}.")
 
+        train_features, train_labels = _validate_features_and_labels(
+            train_features,
+            train_labels,
+            device=self.device,
+        )
+        test_features, test_labels = _validate_features_and_labels(
+            test_features,
+            test_labels,
+            device=self.device,
+        )
+
+        if train_features.shape[1] != test_features.shape[1]:
+            raise ValueError(
+                "Feature dimension mismatch between train and test features. "
+                f"Got {train_features.shape[1]} and {test_features.shape[1]}."
+            )
+
         resolved_classes = _resolve_selected_classes(
-            self.train_labels,
+            train_labels,
             selected_classes,
         )
-        if self.num_output_classes < len(resolved_classes):
+        if num_output_classes < len(resolved_classes):
             raise ValueError(
                 "num_output_classes must be >= number of selected classes. "
-                f"Got {self.num_output_classes} and {len(resolved_classes)}."
+                f"Got {num_output_classes} and {len(resolved_classes)}."
             )
 
         train_features, train_labels = _filter_features_and_map_labels(
-            self.train_features,
-            self.train_labels,
+            train_features,
+            train_labels,
             resolved_classes,
         )
         test_features, test_labels = _filter_features_and_map_labels(
-            self.test_features,
-            self.test_labels,
+            test_features,
+            test_labels,
             resolved_classes,
         )
 
@@ -207,18 +170,24 @@ class LinearProbeEvaluator:
         test_accs: List[float] = []
 
         for _ in range(repeat):
-            if n_samples is None:
-                fewshot_features, fewshot_labels = train_features, train_labels
+            if n_shots is None:
+                selected_features, selected_labels = train_features, train_labels
             else:
-                fewshot_features, fewshot_labels = self._sample_fewshot(
+                selected_features, selected_labels = _sample_per_class(
                     train_features,
                     train_labels,
-                    n_samples=n_samples,
+                    n_shots=n_shots,
                     num_classes=num_classes,
+                    strict=True,
                 )
 
             probe = self._train_probe(
-                fewshot_features, fewshot_labels, input_dim=input_dim
+                selected_features,
+                selected_labels,
+                input_dim=input_dim,
+                num_output_classes=num_output_classes,
+                lr=lr,
+                epochs=epochs,
             )
             train_accs.append(self._evaluate_probe(probe, train_features, train_labels))
             test_accs.append(self._evaluate_probe(probe, test_features, test_labels))

@@ -6,7 +6,7 @@ from typing import Optional, Union
 
 import torch
 
-from repx.utils.mean_utils import (
+from repx.utils.helpers import (
     _compute_class_means,
     _resolve_num_classes,
     _validate_features_and_labels,
