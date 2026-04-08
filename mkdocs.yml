@@ -1,6 +1,5 @@
-site_name: LeTorch
+site_name: RepX
 site_description: PyTorch-native tools for neural representation analysis
-site_url: https://github.com/nishit/repx
 
 theme:
   name: material
@@ -13,9 +12,9 @@ nav:
   - Home: index.md
   - Reference:
       - Alignment: api/alignment.md
-      - Accuracy: api/accuracy.md
+      - Transfer: api/transfer.md
       - Core: api/core.md
-      - Geometry: api/geometry.md
+      - Collapse: api/collapse.md
 
 plugins:
   - search

@@ -37,4 +37,4 @@ print(compute_cdnv(X, y, num_classes=10))
 print(compute_directional_cdnv(X, y, num_classes=10))
 ```
 
-For full API docs pulled from docstrings, see [Alignment](api/alignment.md), [Accuracy](api/accuracy.md), [Core](api/core.md), and [Geometry](api/geometry.md).
+For full API docs pulled from docstrings, see [Alignment](api/alignment.md), [Accuracy](api/transfer.md), [Core](api/core.md), and [Geometry](api/collapse.md).

@@ -4,7 +4,7 @@ Accuracy-based representation metrics.
 
 === "Overview"
 
-    ::: repx.accuracy
+    ::: repx.transfer
 
 === "Submodules"
 
@@ -12,4 +12,4 @@ Accuracy-based representation metrics.
 
 === "Files"
 
-    - `src/repx/accuracy/__init__.py`
+    - `src/repx/transfer/__init__.py`
