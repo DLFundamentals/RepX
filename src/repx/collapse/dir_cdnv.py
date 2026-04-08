@@ -6,7 +6,7 @@ from typing import Optional, Union
 
 import torch
 
-from repx.utils.cdnv_utils import (
+from repx.utils.helpers import (
     _compute_class_means,
     _resolve_num_classes,
     _validate_features_and_labels,
@@ -103,7 +103,7 @@ def compute_directional_cdnv(
                 continue
 
             v = means[class2] - means[class1]
-            v_norm = v.norm()
+            v_norm = torch.linalg.vector_norm(v)
             if v_norm <= eps:
                 continue
 

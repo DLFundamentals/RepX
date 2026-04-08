@@ -29,9 +29,8 @@ def _correlation_rdm(X: torch.Tensor) -> torch.Tensor:
         Tensor of shape `(n_samples, n_samples)` with zero diagonal.
     """
     X_c = X - X.mean(dim=1, keepdim=True)
-    norms = X_c.norm(dim=1, keepdim=True).clamp(min=1e-8)
-    X_n = X_c / norms
-    dist = 1.0 - (X_n @ X_n.T)
+    F.normalize(X_c, p=2, dim=1, out=X_c)
+    dist = 1.0 - (X_c @ X_c.T)
     dist.fill_diagonal_(0.0)
     return dist
 
@@ -101,7 +100,7 @@ def _pearsonr(x: torch.Tensor, y: torch.Tensor) -> torch.Tensor:
     """Compute Pearson correlation for two 1-D tensors."""
     xm = x - x.mean()
     ym = y - y.mean()
-    denom = xm.norm() * ym.norm()
+    denom = torch.linalg.vector_norm(xm) * torch.linalg.vector_norm(ym)
     return torch.where(
         denom > 0,
         (xm * ym).sum() / denom,
