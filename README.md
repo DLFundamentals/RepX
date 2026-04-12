@@ -52,7 +52,7 @@ score_gpu = cka.cka(X.cuda(), Y.cuda())
 
 ```python
 import torch
-from repx.geometry import compute_cdnv, compute_directional_cdnv
+from repx.collapse import compute_cdnv, compute_directional_cdnv
 
 X = torch.randn(100, 128)
 y = torch.randint(0, 10, (100,))
