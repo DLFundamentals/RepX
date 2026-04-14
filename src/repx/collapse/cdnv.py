@@ -33,6 +33,19 @@ def compute_cdnv(
     The final result is averaged over `num_classes * (num_classes - 1) / 2`
     possible class pairs.
 
+    Examples
+    --------
+    ```python
+    import torch
+    from repx.collapse import compute_cdnv
+
+    x = torch.randn(100, 128)
+    y = torch.randint(0, 10, (100,))
+
+    score = compute_cdnv(x, y, num_classes=10)
+    print(score)
+    ```
+
     Parameters
     ----------
     features : Tensor, shape (num_samples, feature_dim)
@@ -51,19 +64,6 @@ def compute_cdnv(
     -------
     float
         Average CDNV value.
-
-    Examples
-    --------
-    ```python
-    import torch
-    from repx.geometry import compute_cdnv
-
-    x = torch.randn(100, 128)
-    y = torch.randint(0, 10, (100,))
-
-    score = compute_cdnv(x, y, num_classes=10)
-    print(score)
-    ```
     """
     if eps <= 0:
         raise ValueError("eps must be positive.")

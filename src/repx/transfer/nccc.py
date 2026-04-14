@@ -22,7 +22,16 @@ __all__ = ["NCCCEvaluator"]
 
 
 class NCCCEvaluator:
-    """Nearest Class Center Classifier (NCCC) evaluator."""
+    """Nearest Class Center Classifier (NCCC) evaluator.
+
+    Computes class centers from support representations and evaluates
+    classification by nearest center in Euclidean space.
+
+    Parameters
+    ----------
+    device : str or torch.device, default="cpu"
+        Device used for computation.
+    """
 
     def __init__(self, device: Union[str, torch.device] = "cpu"):
         self.device = torch.device(device)
@@ -35,7 +44,46 @@ class NCCCEvaluator:
         repeat: int = 1,
         selected_classes: Optional[Sequence[int]] = None,
     ) -> Tuple[List[torch.Tensor], List[int]]:
-        """Compute class centers from full- or few-shot support data."""
+        """Compute class centers from full- or few-shot support data.
+
+        Examples
+        --------
+        ```python
+        import torch
+        from repx.transfer import NCCCEvaluator
+
+        features = torch.randn(100, 64)
+        labels = torch.randint(0, 10, (100,))
+
+        nccc = NCCCEvaluator(device="cpu")
+        centers_list, selected = nccc.compute_class_centers(
+            features,
+            labels,
+            n_shots=5,
+            repeat=3,
+        )
+        ```
+
+        Parameters
+        ----------
+        features : Tensor, shape (num_samples, feature_dim)
+            Support feature matrix.
+        labels : Tensor, shape (num_samples,)
+            Support labels.
+        n_shots : int, optional
+            Number of support samples per class. If omitted, use all support
+            samples in the selected subset.
+        repeat : int, default=1
+            Number of repeated center computations when ``n_shots`` is set.
+        selected_classes : sequence[int], optional
+            If provided, restrict center computation to this class subset.
+
+        Returns
+        -------
+        tuple[list[Tensor], list[int]]
+            ``(centers_per_repeat, resolved_classes)`` where each centers
+            tensor has shape ``(num_selected_classes, feature_dim)``.
+        """
         if repeat < 1:
             raise ValueError(f"repeat must be >= 1. Got {repeat}.")
         if n_shots is not None and n_shots <= 0:
@@ -84,6 +132,38 @@ class NCCCEvaluator:
 
         Centers are computed internally by :meth:`compute_class_centers` from
         the same input ``features`` and ``labels``.
+
+        Examples
+        --------
+        ```python
+        import torch
+        from repx.transfer import NCCCEvaluator
+
+        features = torch.randn(100, 64)
+        labels = torch.randint(0, 10, (100,))
+
+        nccc = NCCCEvaluator(device="cpu")
+        accs = nccc.evaluate(features, labels, n_shots=5, repeat=3)
+        print(accs)
+        ```
+
+        Parameters
+        ----------
+        features : Tensor, shape (num_samples, feature_dim)
+            Query feature matrix.
+        labels : Tensor, shape (num_samples,)
+            Query labels.
+        n_shots : int, optional
+            Number of support samples per class used to compute centers.
+        repeat : int, default=1
+            Number of repeated evaluations when ``n_shots`` is set.
+        selected_classes : sequence[int], optional
+            If provided, evaluate only this class subset.
+
+        Returns
+        -------
+        list[float]
+            Accuracy for each repeat.
         """
         features, labels = _validate_features_and_labels(
             features, labels, device=self.device

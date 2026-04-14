@@ -11,10 +11,10 @@
       
       
       
-        <link rel="prev" href="../../LICENSE/">
+        <link rel="prev" href="../transfer/">
       
       
-        <link rel="next" href="../alignment-rsa/">
+        <link rel="next" href="../transfer-nccc/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Overview - RepX</title>
+        <title>LinearProbeEvaluator - RepX</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#alignment" class="md-skip">
+        <a href="#linearprobeevaluator" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              LinearProbeEvaluator
             
           </span>
         </div>
@@ -332,8 +332,6 @@
                 
   
   
-    
-  
   
   
     
@@ -343,11 +341,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_1" >
         
           
           <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
@@ -368,7 +368,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_1">
             <span class="md-nav__icon md-icon"></span>
             
@@ -383,19 +383,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../alignment/" class="md-nav__link">
         
   
   
@@ -411,7 +402,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -485,6 +475,8 @@
                 
   
   
+    
+  
   
   
     
@@ -494,13 +486,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_2" checked>
         
           
           <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
@@ -521,7 +511,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -564,10 +554,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../transfer-linear-probe/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LinearProbeEvaluator
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -583,6 +600,37 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#evaluate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        evaluate
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -822,6 +870,25 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#evaluate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        evaluate
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -837,22 +904,380 @@
 
 
 
-<h1 id="alignment">Alignment<a class="headerlink" href="#alignment" title="Permanent link">&para;</a></h1>
-<p>Alignment-based representation metrics.</p>
-<p>Alignment metrics compare representation spaces from one or more models.</p>
-<ul>
-<li><strong>RSA</strong> measures whether pairwise similarity structure between examples is
-  preserved across representations.</li>
-<li><strong>CKA</strong> measures global alignment between representation spaces in a way that
-  is robust to common linear transformations.</li>
-</ul>
-<p>Use these metrics when you want to compare learned representations from
-different models, layers, checkpoints, or training regimes.</p>
-<p>See:</p>
-<ul>
-<li><a href="../alignment-rsa/">RSA</a></li>
-<li><a href="../alignment-cka/">CKA</a></li>
-</ul>
+<h1 id="linearprobeevaluator">LinearProbeEvaluator<a class="headerlink" href="#linearprobeevaluator" title="Permanent link">&para;</a></h1>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Train and evaluate a linear probe on frozen features.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>device</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> or <span title="torch.device">device</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Device used for training and evaluation.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#34;cpu&#34;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="evaluate">evaluate<a class="headerlink" href="#evaluate" title="Permanent link">&para;</a></h2>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+    <div class="doc doc-contents first">
+
+        <p>Train and evaluate a linear probe.</p>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">repx.transfer</span><span class="w"> </span><span class="kn">import</span> <span class="n">LinearProbeEvaluator</span>
+
+<span class="n">z_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">y_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">256</span><span class="p">,))</span>
+<span class="n">z_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">y_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">128</span><span class="p">,))</span>
+
+<span class="n">evaluator</span> <span class="o">=</span> <span class="n">LinearProbeEvaluator</span><span class="p">(</span><span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="n">train_acc</span><span class="p">,</span> <span class="n">test_acc</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+    <span class="n">train_features</span><span class="o">=</span><span class="n">z_train</span><span class="p">,</span>
+    <span class="n">train_labels</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span>
+    <span class="n">test_features</span><span class="o">=</span><span class="n">z_test</span><span class="p">,</span>
+    <span class="n">test_labels</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span>
+    <span class="n">num_output_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="n">n_shots</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">repeat</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>train_features</code>
+            </td>
+            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="num_train">num_train</span>, <span title="feature_dim">feature_dim</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Frozen train embeddings.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>train_labels</code>
+            </td>
+            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="num_train">num_train</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Train labels.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>test_features</code>
+            </td>
+            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="num_test">num_test</span>, <span title="feature_dim">feature_dim</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Frozen test embeddings.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>test_labels</code>
+            </td>
+            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="num_test">num_test</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Test labels.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>num_output_classes</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of output classes for the linear probe layer.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>lr</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Learning rate for Adam.</p>
+              </div>
+            </td>
+            <td>
+                  <code>3e-4</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>epochs</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of optimization epochs.</p>
+              </div>
+            </td>
+            <td>
+                  <code>100</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n_shots</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of samples per class for few-shot training. If omitted,
+full filtered train data is used.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>repeat</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of repeated runs.</p>
+              </div>
+            </td>
+            <td>
+                  <code>5</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>selected_classes</code>
+            </td>
+            <td>
+                  <code><span title="sequence">sequence</span>[<span title="int">int</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If provided, restrict training/evaluation to this class subset.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>optimizer</code>
+            </td>
+            <td>
+                  <code>str or Optimizer class</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optimizer choice used to train the probe.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#34;adam&#34;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>optimizer_kwargs</code>
+            </td>
+            <td>
+                  <code><span title="mapping">mapping</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Extra keyword arguments passed to optimizer constructor.
+If <code>lr</code> is not provided, this method's <code>lr</code> argument is used.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>loss_fn</code>
+            </td>
+            <td>
+                  <code>str or nn.Module class</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Loss function used for probe training.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#34;cross_entropy&#34;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>loss_fn_kwargs</code>
+            </td>
+            <td>
+                  <code><span title="mapping">mapping</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Extra keyword arguments passed to the loss constructor.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="tuple">tuple</span>[<span title="float">float</span>, <span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>(mean_train_accuracy, mean_test_accuracy)</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 

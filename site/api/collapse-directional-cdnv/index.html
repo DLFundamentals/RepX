@@ -11,10 +11,10 @@
       
       
       
-        <link rel="prev" href="../../LICENSE/">
+        <link rel="prev" href="../collapse-cdnv/">
       
       
-        <link rel="next" href="../alignment-rsa/">
+        <link rel="next" href="../collapse-etf-deviation/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Overview - RepX</title>
+        <title>compute_directional_cdnv - RepX</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#alignment" class="md-skip">
+        <a href="#compute_directional_cdnv" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              compute_directional_cdnv
             
           </span>
         </div>
@@ -332,8 +332,6 @@
                 
   
   
-    
-  
   
   
     
@@ -343,11 +341,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_1" >
         
           
           <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
@@ -368,7 +368,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_1">
             <span class="md-nav__icon md-icon"></span>
             
@@ -383,19 +383,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../alignment/" class="md-nav__link">
         
   
   
@@ -411,7 +402,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -628,6 +618,8 @@
                 
   
   
+    
+  
   
   
     
@@ -637,13 +629,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" checked>
         
           
           <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
@@ -664,7 +654,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -735,10 +725,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../collapse-directional-cdnv/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -754,6 +753,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -837,22 +837,173 @@
 
 
 
-<h1 id="alignment">Alignment<a class="headerlink" href="#alignment" title="Permanent link">&para;</a></h1>
-<p>Alignment-based representation metrics.</p>
-<p>Alignment metrics compare representation spaces from one or more models.</p>
-<ul>
-<li><strong>RSA</strong> measures whether pairwise similarity structure between examples is
-  preserved across representations.</li>
-<li><strong>CKA</strong> measures global alignment between representation spaces in a way that
-  is robust to common linear transformations.</li>
-</ul>
-<p>Use these metrics when you want to compare learned representations from
-different models, layers, checkpoints, or training regimes.</p>
-<p>See:</p>
-<ul>
-<li><a href="../alignment-rsa/">RSA</a></li>
-<li><a href="../alignment-cka/">CKA</a></li>
-</ul>
+<h1 id="compute_directional_cdnv">compute_directional_cdnv<a class="headerlink" href="#compute_directional_cdnv" title="Permanent link">&para;</a></h1>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+    <div class="doc doc-contents first">
+
+        <p>Compute directional CDNV.</p>
+<p>Directional CDNV measures, for ordered class pairs <code>(c1, c2)</code>, the variance
+of class-<code>c1</code> features projected onto the direction from mean(c1) to
+mean(c2), normalized by squared inter-class distance.</p>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">repx.collapse</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_directional_cdnv</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span><span class="p">,))</span>
+
+<span class="n">score</span> <span class="o">=</span> <span class="n">compute_directional_cdnv</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">num_classes</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+</code></pre></div>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>features</code>
+            </td>
+            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="num_samples">num_samples</span>, <span title="feature_dim">feature_dim</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Embedding matrix.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>labels</code>
+            </td>
+            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="num_samples">num_samples</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Class labels for each sample.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>means</code>
+            </td>
+            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="num_classes">num_classes</span>, <span title="feature_dim">feature_dim</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Precomputed class means. If omitted, class means are computed from
+<code>features</code> and <code>labels</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>num_classes</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of classes. If omitted, inferred as <code>labels.max() + 1</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>device</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> or <span title="torch.device">device</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Device used for metric computation.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#34;cpu&#34;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>eps</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Small positive value to avoid division by zero for degenerate class
+directions.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1e-12</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Average directional CDNV value over ordered class pairs.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 

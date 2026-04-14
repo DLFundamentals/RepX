@@ -96,6 +96,29 @@ class LinearProbeEvaluator:
     ) -> Tuple[float, float]:
         """Train and evaluate a linear probe.
 
+        Examples
+        --------
+        ```python
+        import torch
+        from repx.transfer import LinearProbeEvaluator
+
+        z_train = torch.randn(256, 128)
+        y_train = torch.randint(0, 10, (256,))
+        z_test = torch.randn(128, 128)
+        y_test = torch.randint(0, 10, (128,))
+
+        evaluator = LinearProbeEvaluator(device="cpu")
+        train_acc, test_acc = evaluator.evaluate(
+            train_features=z_train,
+            train_labels=y_train,
+            test_features=z_test,
+            test_labels=y_test,
+            num_output_classes=10,
+            n_shots=5,
+            repeat=3,
+        )
+        ```
+
         Parameters
         ----------
         train_features : Tensor, shape (num_train, feature_dim)

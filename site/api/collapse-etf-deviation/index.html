@@ -11,10 +11,8 @@
       
       
       
-        <link rel="prev" href="../../LICENSE/">
+        <link rel="prev" href="../collapse-directional-cdnv/">
       
-      
-        <link rel="next" href="../alignment-rsa/">
       
       
         
@@ -25,7 +23,7 @@
     
     
       
-        <title>Overview - RepX</title>
+        <title>compute_etf_deviation - RepX</title>
       
     
     
@@ -68,7 +66,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#alignment" class="md-skip">
+        <a href="#compute_etf_deviation" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              compute_etf_deviation
             
           </span>
         </div>
@@ -332,8 +330,6 @@
                 
   
   
-    
-  
   
   
     
@@ -343,11 +339,13 @@
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_1" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_1" >
         
           
           <label class="md-nav__link" for="__nav_4_1" id="__nav_4_1_label" tabindex="0">
@@ -368,7 +366,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_1_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4_1">
             <span class="md-nav__icon md-icon"></span>
             
@@ -383,19 +381,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../alignment/" class="md-nav__link">
         
   
   
@@ -411,7 +400,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -628,6 +616,8 @@
                 
   
   
+    
+  
   
   
     
@@ -637,13 +627,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
         
         
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" checked>
         
           
           <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
@@ -664,7 +652,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -763,10 +751,19 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../collapse-etf-deviation/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -782,6 +779,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -837,22 +835,151 @@
 
 
 
-<h1 id="alignment">Alignment<a class="headerlink" href="#alignment" title="Permanent link">&para;</a></h1>
-<p>Alignment-based representation metrics.</p>
-<p>Alignment metrics compare representation spaces from one or more models.</p>
+<h1 id="compute_etf_deviation">compute_etf_deviation<a class="headerlink" href="#compute_etf_deviation" title="Permanent link">&para;</a></h1>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+    <div class="doc doc-contents first">
+
+        <p>Compute deviation of class means from simplex ETF geometry.</p>
+<p>The metric is based on class means. It first centers class means across
+active classes and L2-normalizes each mean vector. It then compares the
+resulting Gram matrix to the ETF target Gram matrix:</p>
 <ul>
-<li><strong>RSA</strong> measures whether pairwise similarity structure between examples is
-  preserved across representations.</li>
-<li><strong>CKA</strong> measures global alignment between representation spaces in a way that
-  is robust to common linear transformations.</li>
+<li>diagonal entries = 1</li>
+<li>off-diagonal entries = <code>-1 / (C - 1)</code></li>
 </ul>
-<p>Use these metrics when you want to compare learned representations from
-different models, layers, checkpoints, or training regimes.</p>
-<p>See:</p>
-<ul>
-<li><a href="../alignment-rsa/">RSA</a></li>
-<li><a href="../alignment-cka/">CKA</a></li>
-</ul>
+<p>where <code>C</code> is the number of active classes (classes that appear in
+<code>labels</code>). Returned value is the relative Frobenius error:</p>
+<p><code>||G - G_etf||_F / ||G_etf||_F</code></p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>features</code>
+            </td>
+            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="num_samples">num_samples</span>, <span title="feature_dim">feature_dim</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Embedding matrix.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>labels</code>
+            </td>
+            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="num_samples">num_samples</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Class labels for each sample.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>num_classes</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Total number of classes. If omitted, inferred as <code>labels.max() + 1</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>device</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> or <span title="torch.device">device</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Device used for metric computation.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#34;cpu&#34;</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>eps</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Numerical stability constant used in vector normalization.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1e-12</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Relative ETF deviation. Lower is better; 0 indicates perfect ETF
+geometry for active class means.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 

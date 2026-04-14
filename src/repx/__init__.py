@@ -1,6 +1,6 @@
 """PyTorch-native tools for neural representation analysis.
 
-LeTorch provides alignment metrics for comparing neural representations,
+RepX provides alignment metrics for comparing neural representations,
 including RSA and CKA, with native PyTorch tensor support on CPU and GPU.
 """
 

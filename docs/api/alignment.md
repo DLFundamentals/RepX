@@ -2,40 +2,17 @@
 
 Alignment-based representation metrics.
 
-=== "Overview"
+Alignment metrics compare representation spaces from one or more models.
 
-    ::: repx.alignment
-        options:
-          members: false
+- **RSA** measures whether pairwise similarity structure between examples is
+  preserved across representations.
+- **CKA** measures global alignment between representation spaces in a way that
+  is robust to common linear transformations.
 
-=== "Submodules"
+Use these metrics when you want to compare learned representations from
+different models, layers, checkpoints, or training regimes.
 
-    - `repx.alignment.rsa`
-    - `repx.alignment.cka`
+See:
 
-=== "Files"
-
-    - `src/repx/alignment/__init__.py`
-    - `src/repx/alignment/rsa.py`
-    - `src/repx/alignment/cka.py`
-
-## RSA
-
-::: repx.alignment.rsa.RSA
-    options:
-      show_root_heading: false
-      show_root_toc_entry: false
-      members:
-        - compute_rdm
-        - rdm_upper_tri
-        - rsa
-
-## CKA
-
-::: repx.alignment.cka.CKA
-    options:
-      show_root_heading: false
-      show_root_toc_entry: false
-      members:
-        - compute_kernel
-        - cka
+- [RSA](alignment-rsa.md)
+- [CKA](alignment-cka.md)

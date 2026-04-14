@@ -161,16 +161,6 @@ class RSA:
     def compute_rdm(self, X: torch.Tensor) -> torch.Tensor:
         """Compute the Representational Dissimilarity Matrix (RDM).
 
-        Parameters
-        ----------
-        X : Tensor, shape (n_samples, n_features)
-            One row per sample.
-
-        Returns
-        -------
-        rdm : Tensor, shape (n_samples, n_samples)
-            Symmetric matrix with zero diagonal.
-
         Examples
         --------
         ```python
@@ -181,19 +171,21 @@ class RSA:
         rdm = RSA(rdm_metric="correlation").compute_rdm(X)
         print(rdm.shape)  # torch.Size([5, 5])
         ```
+
+        Parameters
+        ----------
+        X : Tensor, shape (n_samples, n_features)
+            One row per sample.
+
+        Returns
+        -------
+        rdm : Tensor, shape (n_samples, n_samples)
+            Symmetric matrix with zero diagonal.
         """
         return _METRICS[self.rdm_metric](X)  # type: ignore[operator]
 
     def rdm_upper_tri(self, rdm: torch.Tensor) -> torch.Tensor:
         """Extract the strict upper-triangle of an RDM as a flat 1-D vector.
-
-        Parameters
-        ----------
-        rdm : Tensor, shape (n, n)
-
-        Returns
-        -------
-        vec : Tensor, shape (n*(n-1)//2,)
 
         Examples
         --------
@@ -207,6 +199,14 @@ class RSA:
         vec = RSA().rdm_upper_tri(rdm)
         print(vec)  # tensor([1., 2., 3.])
         ```
+
+        Parameters
+        ----------
+        rdm : Tensor, shape (n, n)
+
+        Returns
+        -------
+        vec : Tensor, shape (n*(n-1)//2,)
         """
         n = rdm.shape[0]
         rows, cols = torch.triu_indices(n, n, offset=1, device=rdm.device)
@@ -217,6 +217,20 @@ class RSA:
 
         Builds an RDM for each representation matrix, vectorises the upper
         triangles, and correlates them using the settings from ``__init__``.
+
+        Examples
+        --------
+        ```python
+        import torch
+        from repx.alignment import RSA
+
+        rsa = RSA(rdm_metric="correlation", compare="spearman")
+        X = torch.randn(20, 64)
+        Y = torch.randn(20, 128)
+
+        score = rsa.rsa(X, Y)
+        print(score.shape)  # torch.Size([])
+        ```
 
         Parameters
         ----------
@@ -234,20 +248,6 @@ class RSA:
         ------
         ValueError
             If X and Y have different number of samples.
-
-        Examples
-        --------
-        ```python
-        import torch
-        from repx.alignment import RSA
-
-        rsa = RSA(rdm_metric="correlation", compare="spearman")
-        X = torch.randn(20, 64)
-        Y = torch.randn(20, 128)
-
-        score = rsa.rsa(X, Y)
-        print(score.shape)  # torch.Size([])
-        ```
         """
         if X.shape[0] != Y.shape[0]:
             raise ValueError(

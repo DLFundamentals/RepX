@@ -1,134 +1,97 @@
-# RepX ⛵️
+# RepX
 
-PyTorch-native metrics for representation analysis. 
+## 1. Overview
 
-## Installation
+RepX is built to evaluate representation quality directly from embeddings.
+If you can produce a representation tensor, you can analyze it with RepX.
+
+This works across learning paradigms:
+
+- **Supervised learning** (classification, regression backbones)
+- **Self-supervised learning** (contrastive, masked modeling, distillation)
+- **Unsupervised learning** (autoencoders, clustering-based pipelines)
+
+The only requirement is a representation, e.g. `z = model(x)`.
+
+## 2. Installation
 
 ```bash
 pip install repx
 ```
 
-## Quick Start
+## 3. Examples
 
-### RSA
+Start from the same pattern in every setup:
 
 ```python
-import torch
-from repx import RSA
-
-# Two representation matrices — rows = stimuli, columns = features
-X = torch.randn(50, 512)   # e.g. embeddings from model A
-Y = torch.randn(50, 768)   # e.g. embeddings from model B (different dim is fine)
-
-rsa = RSA(rdm_metric="correlation", compare="spearman")
-
-# Full RSA pipeline: RDM → upper triangle → Spearman correlation
-r = rsa.rsa(X, Y)
-print(r.item())   # scalar in [−1, +1]
-
-# GPU — just pass GPU tensors, no other changes needed
-r_gpu = rsa.rsa(X.cuda(), Y.cuda())
+# model can be any feature extractor: CNN, ViT, MLP, SSL encoder, etc.
+z = model(x)
 ```
 
-### CKA
+### Transfer (downstream performance)
 
 ```python
 import torch
-from repx import CKA
+from repx.transfer import LinearProbeEvaluator, NCCCEvaluator
 
-X = torch.randn(50, 512)
-Y = torch.randn(50, 768)
+# model can be any model that outputs representations
+z_train = model(x_train)
+z_test = model(x_test)
 
-cka = CKA(kernel="linear")
+# Linear probe: train a linear classifier on frozen features
+lp = LinearProbeEvaluator(device="cpu")
+train_acc, test_acc = lp.evaluate(
+    train_features=z_train,
+    train_labels=y_train,
+    test_features=z_test,
+    test_labels=y_test,
+    num_output_classes=num_classes,
+    n_shots=None,  # set to int for few-shot per class
+)
 
-score = cka.cka(X, Y)
-print(score.item())   # scalar in [0, 1]
-
-# GPU
-score_gpu = cka.cka(X.cuda(), Y.cuda())
+# NCCC: nearest class center evaluation
+nccc = NCCCEvaluator(device="cpu")
+accs = nccc.evaluate(
+    features=z_test,
+    labels=y_test,
+    n_shots=5,
+    repeat=3,
+)
 ```
 
-### Geometry (CDNV)
+### Geometry (collapse analysis)
 
 ```python
-import torch
 from repx.collapse import compute_cdnv, compute_directional_cdnv
 
-X = torch.randn(100, 128)
-y = torch.randint(0, 10, (100,))
+# z can come from any model
+z = model(x)
 
-cdnv_score = compute_cdnv(X, y, num_classes=10)
-dir_cdnv_score = compute_directional_cdnv(X, y, num_classes=10)
-
-print(cdnv_score)
-print(dir_cdnv_score)
+cdnv = compute_cdnv(z, y, num_classes=num_classes)
+dir_cdnv = compute_directional_cdnv(z, y, num_classes=num_classes)
 ```
 
-## RSA API
+### Alignment (representation similarity)
 
-### `RSA(rdm_metric="correlation", compare="spearman")`
+```python
+from repx import RSA, CKA
 
-Instantiate an RSA object with the desired settings.
+z_a = model_a(x)
+z_b = model_b(x)
 
-| Argument | Options | Default |
-|---|---|---|
-| `rdm_metric` | `"correlation"`, `"cosine"`, `"euclidean"`, `"cityblock"` | `"correlation"` |
-| `compare` | `"spearman"`, `"pearson"` | `"spearman"` |
+rsa = RSA(rdm_metric="correlation", compare="spearman")
+cka = CKA(kernel="linear")
 
-### `RSA.compute_rdm(X) → Tensor`
+print(rsa.rsa(z_a, z_b).item())
+print(cka.cka(z_a, z_b).item())
+```
 
-Compute the Representational Dissimilarity Matrix for a stimulus set using the instance's `rdm_metric`.
+For full API docs, see [Alignment](docs/api/alignment.md), [Transfer](docs/api/transfer.md), [Core](docs/api/core.md), and [Collapse](docs/api/collapse.md).
 
-| Metric | Description |
-|---|---|
-| `"correlation"` | 1 − Pearson r (default) — invariant to row-wise scaling & translation |
-| `"cosine"` | 1 − cosine similarity — invariant to row-wise scaling |
-| `"euclidean"` | L2 distance |
-| `"cityblock"` | L1 / Manhattan distance |
+## 4. License
 
-Returns a symmetric `(n_stimuli, n_stimuli)` tensor with zero diagonal.
+RepX is released under the GNU GPLv3. See [docs/LICENSE.md](docs/LICENSE.md) for details.
 
-### `RSA.rdm_upper_tri(rdm) → Tensor`
+## 5. Contributing
 
-Extract the strict upper triangle of an RDM as a flat 1-D vector of length `n*(n-1)//2`.
-
-### `RSA.rsa(X, Y) → Tensor`
-
-Full RSA pipeline: build RDMs → vectorise upper triangles → correlate, using the instance's `rdm_metric` and `compare` settings.
-
-Returns a scalar tensor in `[−1, +1]`. Call `.item()` for a Python float.
-
-## CKA API
-
-### `CKA(kernel="linear")`
-
-Instantiate a CKA object. Uses the debiased HSIC estimator (Kornblith et al., 2019) to avoid score inflation when the number of features exceeds the number of stimuli.
-
-| Argument | Options | Default |
-|---|---|---|
-| `kernel` | `"linear"` | `"linear"` |
-
-### `CKA.compute_kernel(X) → Tensor`
-
-Compute the kernel (Gram) matrix K = X @ Xᵀ. Returns a symmetric `(n_stimuli, n_stimuli)` PSD tensor.
-
-### `CKA.cka(X, Y) → Tensor`
-
-Compute CKA: build kernel matrices → zero diagonals → normalised debiased HSIC.
-
-Requires at least 4 stimuli. Returns a scalar tensor. Call `.item()` for a Python float.
-
-## RSA vs CKA
-
-| | RSA | CKA |
-|---|---|---|
-| **Range** | [−1, +1] | [0, +1] |
-| **Invariant to** | scaling, translation (correlation metric) | orthogonal transforms, isotropic scaling |
-| **Based on** | pairwise distance vectors + rank correlation | kernel matrices + normalised inner product |
-| **Bias correction** | — | debiased HSIC (handles d >> n) |
-
-## Why PyTorch?
-
-- All operations run on **GPU** when tensors are on GPU
-- No `scipy` dependency at runtime
-- Integrates naturally into PyTorch model evaluation loops and `torch.no_grad()` blocks
+See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines and development workflow.

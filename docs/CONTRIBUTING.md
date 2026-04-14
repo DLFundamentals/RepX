@@ -29,13 +29,13 @@ pytest tests/
 
 ## Development Guidelines
 
-### Before writing code
+### 1. Before writing code
 
 - Check existing structure (`alignment/`, `collapse/`, `transfer/`)
 - Follow the same style and API patterns
 - Keep functions simple and modular
 
-### Adding a new metric (example: CKA)
+### 2. Adding a new metric
 
 1. Create a new file in the appropriate submodule:
 
@@ -54,13 +54,13 @@ src/repx/alignment/cka.py
 
 ## Pull Requests
 
-Before submitting a PR:
+### 1. Before submitting a PR
 
 - Run tests: `pytest tests/`
 - Run hooks: `pre-commit run --all-files`
 - Make sure CI passes
 
-PRs should:
+### 2. PRs should 
 
 - Be focused (one feature or bugfix per PR)
 - Include tests for new features or bugfixes

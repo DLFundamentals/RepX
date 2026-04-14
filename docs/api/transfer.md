@@ -2,38 +2,13 @@
 
 Transfer-based representation metrics.
 
-=== "Overview"
+Transfer metrics measure how useful learned representations are for downstream
+tasks.
 
-    ::: repx.transfer
-        options:
-          members: false
+- **Linear Probe** evaluates linear separability of representations.
+- **NCCC** evaluates classification quality using nearest class centers.
 
-=== "Submodules"
+See:
 
-    - `repx.transfer.nccc`
-    - `repx.transfer.linear_probe`
-
-=== "Files"
-
-    - `src/repx/transfer/__init__.py`
-    - `src/repx/transfer/nccc.py`
-    - `src/repx/transfer/linear_probe.py`
-
-## NCCCEvaluator
-
-::: repx.transfer.nccc.NCCCEvaluator
-    options:
-      show_root_heading: false
-      show_root_toc_entry: false
-      members:
-        - compute_class_centers
-        - evaluate
-
-## LinearProbeEvaluator
-
-::: repx.transfer.linear_probe.LinearProbeEvaluator
-    options:
-      show_root_heading: false
-      show_root_toc_entry: false
-      members:
-        - evaluate
+- [LinearProbeEvaluator](transfer-linear-probe.md)
+- [NCCCEvaluator](transfer-nccc.md)

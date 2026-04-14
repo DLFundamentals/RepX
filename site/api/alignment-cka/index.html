@@ -11,10 +11,10 @@
       
       
       
-        <link rel="prev" href="../../LICENSE/">
+        <link rel="prev" href="../alignment-rsa/">
       
       
-        <link rel="next" href="../alignment-rsa/">
+        <link rel="next" href="../transfer/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Overview - RepX</title>
+        <title>CKA - RepX</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#alignment" class="md-skip">
+        <a href="#cka" class="md-skip">
           Skip to content
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Overview
+              CKA
             
           </span>
         </div>
@@ -383,19 +383,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../alignment/" class="md-nav__link">
         
   
   
@@ -411,7 +402,6 @@
   
 
       </a>
-      
     </li>
   
 
@@ -449,10 +439,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../alignment-cka/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CKA
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -468,6 +485,48 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#repx.alignment.cka.CKA.compute_kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compute_kernel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repx.alignment.cka.CKA.cka" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cka
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -822,6 +881,36 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#repx.alignment.cka.CKA.compute_kernel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        compute_kernel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repx.alignment.cka.CKA.cka" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cka
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -837,22 +926,305 @@
 
 
 
-<h1 id="alignment">Alignment<a class="headerlink" href="#alignment" title="Permanent link">&para;</a></h1>
-<p>Alignment-based representation metrics.</p>
-<p>Alignment metrics compare representation spaces from one or more models.</p>
-<ul>
-<li><strong>RSA</strong> measures whether pairwise similarity structure between examples is
-  preserved across representations.</li>
-<li><strong>CKA</strong> measures global alignment between representation spaces in a way that
-  is robust to common linear transformations.</li>
+<h1 id="cka">CKA<a class="headerlink" href="#cka" title="Permanent link">&para;</a></h1>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Centered Kernel Alignment in PyTorch.</p>
+<p>Compares two representation spaces with centered kernel alignment using
+the debiased HSIC estimator.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>kernel</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Kernel used to build the similarity matrix.</p>
+<p><code>"linear"</code> (default)
+    K = X @ Xᵀ.  Invariant to <strong>orthogonal transformations</strong> and
+    <strong>isotropic scaling</strong> of the rows.</p>
+              </div>
+            </td>
+            <td>
+                  <code>&#39;linear&#39;</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <ul>
+<li>Invariant to orthogonal transforms and isotropic scaling with linear kernel.</li>
+<li>Requires at least 4 stimuli (rows).</li>
 </ul>
-<p>Use these metrics when you want to compare learned representations from
-different models, layers, checkpoints, or training regimes.</p>
-<p>See:</p>
-<ul>
-<li><a href="../alignment-rsa/">RSA</a></li>
-<li><a href="../alignment-cka/">CKA</a></li>
-</ul>
+</details>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="repx.alignment.cka.CKA.compute_kernel" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">compute_kernel</span><span class="p">(</span><span class="n">X</span><span class="p">)</span></code>
+
+<a href="#repx.alignment.cka.CKA.compute_kernel" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compute the kernel (Gram) matrix for a set of representations.</p>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">repx.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">CKA</span>
+
+<span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">CKA</span><span class="p">()</span><span class="o">.</span><span class="n">compute_kernel</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">K</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># torch.Size([4, 4])</span>
+</code></pre></div>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>X</code>
+            </td>
+            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="n_samples">n_samples</span>, <span title="n_features">n_features</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>One row per stimulus.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>K</code></td>            <td>
+                  <code>(<span title="Tensor">Tensor</span>, <span title="shape">shape</span>(<span title="n_samples">n_samples</span>, <span title="n_samples">n_samples</span>))</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Symmetric positive semi-definite kernel matrix.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="repx.alignment.cka.CKA.cka" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">cka</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span></code>
+
+<a href="#repx.alignment.cka.CKA.cka" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Compute Centered Kernel Alignment (CKA).</p>
+<p>Builds a kernel matrix for each representation, zeros the diagonals,
+and computes the normalised debiased HSIC.</p>
+<p>Requires at least 4 stimuli (rows) due to the <code>n*(n-3)</code>
+denominator in the unbiased HSIC estimator.</p>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">repx.alignment</span><span class="w"> </span><span class="kn">import</span> <span class="n">CKA</span>
+
+<span class="n">cka</span> <span class="o">=</span> <span class="n">CKA</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s2">&quot;linear&quot;</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
+
+<span class="n">score</span> <span class="o">=</span> <span class="n">cka</span><span class="o">.</span><span class="n">cka</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">score</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># torch.Size([])</span>
+</code></pre></div>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>X</code>
+            </td>
+            <td>
+                  <code>Tensor, shape (n_samples, n_features_*)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Row-per-sample matrices.  Both must have the same number of
+rows; feature dimensionalities may differ.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>Y</code>
+            </td>
+            <td>
+                  <code>Tensor, shape (n_samples, n_features_*)</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Row-per-sample matrices.  Both must have the same number of
+rows; feature dimensionalities may differ.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>score</code></td>            <td>
+                  <code>scalar Tensor</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>CKA score.  Returns 1.0 for identical representations, ≈ 0.0
+for independent ones.  Call <code>.item()</code> for a Python float.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="ValueError">ValueError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If X and Y have different number of samples or n &lt; 4.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
 
 
 

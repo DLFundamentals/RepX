@@ -87,16 +87,6 @@ class CKA:
     def compute_kernel(self, X: torch.Tensor) -> torch.Tensor:
         """Compute the kernel (Gram) matrix for a set of representations.
 
-        Parameters
-        ----------
-        X : Tensor, shape (n_samples, n_features)
-            One row per stimulus.
-
-        Returns
-        -------
-        K : Tensor, shape (n_samples, n_samples)
-            Symmetric positive semi-definite kernel matrix.
-
         Examples
         --------
         ```python
@@ -107,6 +97,16 @@ class CKA:
         K = CKA().compute_kernel(X)
         print(K.shape)  # torch.Size([4, 4])
         ```
+
+        Parameters
+        ----------
+        X : Tensor, shape (n_samples, n_features)
+            One row per stimulus.
+
+        Returns
+        -------
+        K : Tensor, shape (n_samples, n_samples)
+            Symmetric positive semi-definite kernel matrix.
         """
         return _KERNELS[self.kernel](X)  # type: ignore[operator]
 
@@ -118,6 +118,20 @@ class CKA:
 
         Requires at least 4 stimuli (rows) due to the ``n*(n-3)``
         denominator in the unbiased HSIC estimator.
+
+        Examples
+        --------
+        ```python
+        import torch
+        from repx.alignment import CKA
+
+        cka = CKA(kernel="linear")
+        X = torch.randn(20, 64)
+        Y = torch.randn(20, 128)
+
+        score = cka.cka(X, Y)
+        print(score.shape)  # torch.Size([])
+        ```
 
         Parameters
         ----------
@@ -135,20 +149,6 @@ class CKA:
         ------
         ValueError
             If X and Y have different number of samples or n < 4.
-
-        Examples
-        --------
-        ```python
-        import torch
-        from repx.alignment import CKA
-
-        cka = CKA(kernel="linear")
-        X = torch.randn(20, 64)
-        Y = torch.randn(20, 128)
-
-        score = cka.cka(X, Y)
-        print(score.shape)  # torch.Size([])
-        ```
         """
         if X.shape[0] != Y.shape[0]:
             raise ValueError(

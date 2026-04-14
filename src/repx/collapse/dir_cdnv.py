@@ -29,6 +29,19 @@ def compute_directional_cdnv(
     of class-`c1` features projected onto the direction from mean(c1) to
     mean(c2), normalized by squared inter-class distance.
 
+    Examples
+    --------
+    ```python
+    import torch
+    from repx.collapse import compute_directional_cdnv
+
+    x = torch.randn(100, 128)
+    y = torch.randint(0, 10, (100,))
+
+    score = compute_directional_cdnv(x, y, num_classes=10)
+    print(score)
+    ```
+
     Parameters
     ----------
     features : Tensor, shape (num_samples, feature_dim)
@@ -50,19 +63,6 @@ def compute_directional_cdnv(
     -------
     float
         Average directional CDNV value over ordered class pairs.
-
-    Examples
-    --------
-    ```python
-    import torch
-    from repx.geometry import compute_directional_cdnv
-
-    x = torch.randn(100, 128)
-    y = torch.randint(0, 10, (100,))
-
-    score = compute_directional_cdnv(x, y, num_classes=10)
-    print(score)
-    ```
     """
     if eps <= 0:
         raise ValueError("eps must be positive.")

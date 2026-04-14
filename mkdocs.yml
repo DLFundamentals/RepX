@@ -10,11 +10,22 @@ theme:
 
 nav:
   - Home: index.md
+  - Contributing: CONTRIBUTING.md
+  - License: LICENSE.md
   - Reference:
-      - Alignment: api/alignment.md
-      - Transfer: api/transfer.md
-      - Core: api/core.md
-      - Collapse: api/collapse.md
+      - Alignment:
+          - Overview: api/alignment.md
+          - RSA: api/alignment-rsa.md
+          - CKA: api/alignment-cka.md
+      - Transfer:
+          - Overview: api/transfer.md
+          - LinearProbeEvaluator: api/transfer-linear-probe.md
+          - NCCCEvaluator: api/transfer-nccc.md
+      - Collapse:
+          - Overview: api/collapse.md
+          - compute_cdnv: api/collapse-cdnv.md
+          - compute_directional_cdnv: api/collapse-directional-cdnv.md
+          - compute_etf_deviation: api/collapse-etf-deviation.md
 
 plugins:
   - search
